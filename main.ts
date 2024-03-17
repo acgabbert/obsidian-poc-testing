@@ -1,5 +1,5 @@
 import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault, DropdownComponent } from 'obsidian';
-import {checkFolderExistsRecursive, createFolderIfNotExists} from 'vaultUtils';
+import {checkFolderExistsRecursive, createFolderIfNotExists, todayFolderStructure} from 'vaultUtils';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -19,17 +19,9 @@ export default class MyPlugin extends Plugin {
 
 		await this.loadSettings();
 		console.log(this.settings.rootFolder);
+		const structure = todayFolderStructure();
+		console.log(structure);
 		const vault = this.app.vault;
-		const today = new Date();
-		//const folderName = today.toISOString().slice(0, 10);
-		var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-		const folderName = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);
-		console.log(folderName)  // => '2015-01-26T06:40:36.181'
-	
-		const folderPath = `${folderName}`;
-
-		const folderExists = checkFolderExistsRecursive(vault, folderName)
-		console.log(folderExists)
 		// dummy data
 		const response = await fetch('https://api.github.com/users/github');
 		const data = await response.json();
@@ -38,7 +30,11 @@ export default class MyPlugin extends Plugin {
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			new Notice(data['bio']);
-			createFolderIfNotExists(vault, '/detections')
+			const folderArray = todayFolderStructure();
+			for (let i = 1; i <= folderArray.length; i++) {
+				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
+				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
+			}
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
@@ -174,5 +170,16 @@ class SampleSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+		new Setting(containerEl)
+			.setName('Root Folder')
+			.setDesc('The folder to start searching from')
+			.addText(text => text
+				.setPlaceholder('notes')
+				.setValue(this.plugin.settings.rootFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.rootFolder = value;
+					await this.plugin.saveSettings();
+				})
+			);
 	}
 }
