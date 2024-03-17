@@ -3,11 +3,11 @@ import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, Plugi
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
-	mySetting: string;
+	rootFolder: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	rootFolder: ''
 }
 
 export default class MyPlugin extends Plugin {
@@ -16,6 +16,7 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 
 		await this.loadSettings();
+		console.log(this.settings.rootFolder);
 		const vault = this.app.vault;
 		const today = new Date();
 		//const folderName = today.toISOString().slice(0, 10);
@@ -184,13 +185,13 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('Root Folder')
+			.setDesc('The folder to start searching from')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				.setPlaceholder('example/path')
+				.setValue(this.plugin.settings.rootFolder)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.rootFolder = value;
 					await this.plugin.saveSettings();
 				}));
 	}
