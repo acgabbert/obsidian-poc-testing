@@ -1,4 +1,4 @@
-import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -16,6 +16,13 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 
 		await this.loadSettings();
+		const vault = this.app.vault;
+		const today = new Date();
+		const folderName = today.toISOString().slice(0, 10);
+		const folderPath = `${folderName}`
+
+		const folderExists = this.checkFolderExistsRecursive(vault, folderName)
+		console.log(folderExists)
 		// dummy data
 		const response = await fetch('https://api.github.com/users/github');
 		const data = await response.json();
@@ -113,6 +120,38 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
+		async function searchFolder(rootPath: string): Promise<string> {
+			const checkVal = rootPath + "/" + folderName;
+			console.log(`entering function. checking ${checkVal}`);
+			const folderExists = await vault.adapter.exists(checkVal, true);
+            if (folderExists) return folderName;
+            const subFolders = (await vault.adapter.list(rootPath)).folders;
+			const i = subFolders.indexOf('.obsidian');
+			if (i > -1) {
+				subFolders.splice(i, 1);
+			}
+            for (const subFolder of subFolders) {
+				console.log(`checking ${subFolder}`)
+                const isSubFolder = await vault.adapter.exists(subFolder, true);
+				console.log(`isSubFolder ${isSubFolder}`)
+                if (isSubFolder) {
+                    const found = await searchFolder(subFolder);
+					console.log(`found ${found}, ${subFolder}`)
+                    if (found && !found.startsWith(subFolder)) {
+						console.log(`returning ${subFolder}/${found}`);
+						return `${subFolder}/${found}`;
+					} 
+					else if (found) return found;
+                }
+            }
+
+            return "";
+        }
+
+        return await searchFolder("");
 	}
 }
 
