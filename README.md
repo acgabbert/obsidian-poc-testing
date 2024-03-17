@@ -18,3 +18,16 @@ The code was derived from the Obsidian Sample Plugin (https://github.com/obsidia
 ## API Documentation
 
 See https://github.com/obsidianmd/obsidian-api
+
+## Ideas for Later On
+- Leverage [Obsidian's URI protocol](https://help.obsidian.md/Extending+Obsidian/Obsidian+URI) via Chrome to take actions
+  - Search Vault: `obsidian://search?vault=my_vault&query=%s`
+  - Create a note: `obsidian://new?vault=my_vault&silent=true&name=%s`
+  - Save a link to a note: `obsidian://new?vault=my_vault&silent=true&name=Links&append=true&content=%s%0D%0A`
+  - Save a to-do to a note: `obsidian://new?vault=my_vault&silent=true&name=TODOs&append=true&content=-%20[%20]%20%s%0D%0A`
+
+NOTE: allow Chrome to open Obsidian without asking by running the following command:
+```
+defaults write com.google.Chrome URLAllowlist -array 'obsidian://*'
+```
+
