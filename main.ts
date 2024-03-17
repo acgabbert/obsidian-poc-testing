@@ -1,13 +1,15 @@
-import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault } from 'obsidian';
-
+import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault, DropdownComponent } from 'obsidian';
+import {checkFolderExistsRecursive, createFolderIfNotExists} from 'vaultUtils';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
 	rootFolder: string;
+	rootFolderDropdown: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	rootFolder: ''
+	rootFolder: '',
+	rootFolderDropdown: ''
 }
 
 export default class MyPlugin extends Plugin {
@@ -21,12 +23,12 @@ export default class MyPlugin extends Plugin {
 		const today = new Date();
 		//const folderName = today.toISOString().slice(0, 10);
 		var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-		const folderName = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);		
+		const folderName = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);
 		console.log(folderName)  // => '2015-01-26T06:40:36.181'
 	
 		const folderPath = `${folderName}`;
 
-		const folderExists = this.checkFolderExistsRecursive(vault, folderName)
+		const folderExists = checkFolderExistsRecursive(vault, folderName)
 		console.log(folderExists)
 		// dummy data
 		const response = await fetch('https://api.github.com/users/github');
@@ -36,6 +38,7 @@ export default class MyPlugin extends Plugin {
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			new Notice(data['bio']);
+			createFolderIfNotExists(vault, '/detections')
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
@@ -126,33 +129,6 @@ export default class MyPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
-
-	async checkFolderExistsRecursive(vault: Vault, folderName: string): Promise<string> {
-		async function searchFolder(rootPath: string): Promise<string> {
-			const checkVal = rootPath + "/" + folderName;
-			const folderExists = await vault.adapter.exists(checkVal, true);
-            if (folderExists) return folderName;
-            const subFolders = (await vault.adapter.list(rootPath)).folders;
-			const i = subFolders.indexOf('.obsidian');
-			if (i > -1) {
-				subFolders.splice(i, 1);
-			}
-            for (const subFolder of subFolders) {
-                const isSubFolder = await vault.adapter.exists(subFolder, true);
-                if (isSubFolder) {
-                    const found = await searchFolder(subFolder);
-                    if (found && !found.startsWith(subFolder)) {
-						return `${subFolder}/${found}`;
-					} 
-					else if (found) return found;
-                }
-            }
-
-            return "";
-        }
-
-        return await searchFolder("");
-	}
 }
 
 class SampleModal extends Modal {
@@ -179,20 +155,24 @@ class SampleSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	display(): void {
+	async display(): Promise<void> {
 		const {containerEl} = this;
 
 		containerEl.empty();
+		const vault = this.app.vault;
+		const subFolders = (await vault.adapter.list('')).folders;
 
 		new Setting(containerEl)
-			.setName('Root Folder')
+			.setName('Root Folder Dropdown')
 			.setDesc('The folder to start searching from')
-			.addText(text => text
-				.setPlaceholder('example/path')
-				.setValue(this.plugin.settings.rootFolder)
-				.onChange(async (value) => {
-					this.plugin.settings.rootFolder = value;
+			.addDropdown( (dropdown) => {
+				for (const subFolder in subFolders) {
+					dropdown.addOption(subFolder, subFolder);
+				}
+				dropdown.onChange(async (value) => {
+					this.plugin.settings.rootFolderDropdown = value;
 					await this.plugin.saveSettings();
-				}));
+				});
+			});
 	}
 }
