@@ -18,8 +18,12 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 		const vault = this.app.vault;
 		const today = new Date();
-		const folderName = today.toISOString().slice(0, 10);
-		const folderPath = `${folderName}`
+		//const folderName = today.toISOString().slice(0, 10);
+		var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+		const folderName = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);		
+		console.log(folderName)  // => '2015-01-26T06:40:36.181'
+	
+		const folderPath = `${folderName}`;
 
 		const folderExists = this.checkFolderExistsRecursive(vault, folderName)
 		console.log(folderExists)
