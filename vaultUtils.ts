@@ -1,6 +1,6 @@
 import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault, DropdownComponent } from 'obsidian';
 
-export {checkFolderExistsRecursive, createFolderIfNotExists, todayFolderStructure};
+export {checkFolderExistsRecursive, createFolderIfNotExists, todayFolderStructure, createNoteFromClipboard};
 
 /*
 folder structure: YYYY/YYYY-QQ/YYYY-MM/YYYY-MM-DD
@@ -62,4 +62,12 @@ async function createFolderIfNotExists(vault: Vault, folderName: string) {
     } else {
         console.log('folder exists');
     }
+}
+
+async function createNoteFromClipboard(vault: Vault, folderName: string) {
+    console.log(`creating note from clipboard in folder: ${folderName}`)
+    const clipboardText = await navigator.clipboard.readText();
+    const noteTitle = `${clipboardText.trim()}.md`;
+    console.log(`note ${folderName}/${noteTitle}`)
+    await vault.create(`${folderName}/${noteTitle}`, '');
 }

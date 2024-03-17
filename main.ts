@@ -1,5 +1,5 @@
 import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault, DropdownComponent } from 'obsidian';
-import {checkFolderExistsRecursive, createFolderIfNotExists, todayFolderStructure} from 'vaultUtils';
+import {checkFolderExistsRecursive, createFolderIfNotExists, todayFolderStructure, createNoteFromClipboard} from 'vaultUtils';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -35,6 +35,17 @@ export default class MyPlugin extends Plugin {
 				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
 			}
+		});
+		// This creates an icon in the left ribbon.
+		const addNoteIcon = this.addRibbonIcon('file-plus-2', 'Create note from clipboard', (evt: MouseEvent) => {
+			// Called when the user clicks the icon.
+			const folderArray = todayFolderStructure();
+			for (let i = 1; i <= folderArray.length; i++) {
+				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
+				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
+			}
+			console.log(`creating /${this.settings.rootFolder}/${folderArray.join('/')}`)
+			createNoteFromClipboard(vault, `/${this.settings.rootFolder}/${folderArray.join('/')}`);
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
