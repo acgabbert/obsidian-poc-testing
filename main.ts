@@ -1,6 +1,5 @@
-import { App, Editor, Menu, MenuItem, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault, DropdownComponent } from 'obsidian';
-import {checkFolderExistsRecursive, createFolderIfNotExists, todayFolderStructure, createNoteFromClipboard} from 'vaultUtils';
-// Remember to rename these classes and interfaces!
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {checkFolderExistsRecursive, createFolderIfNotExists, createNote, defangDomain, todayFolderStructure} from 'obsidian-utils/src';
 
 interface MyPluginSettings {
 	rootFolder: string;
@@ -16,10 +15,10 @@ export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
-
+		console.log('loaded');
 		await this.loadSettings();
 		console.log(this.settings.rootFolder);
-		const structure = todayFolderStructure();
+		const structure = todayFolderStructure(true);
 		console.log(structure);
 		const vault = this.app.vault;
 		// dummy data
@@ -30,7 +29,7 @@ export default class MyPlugin extends Plugin {
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			new Notice(data['bio']);
-			const folderArray = todayFolderStructure();
+			const folderArray = todayFolderStructure(true);
 			for (let i = 1; i <= folderArray.length; i++) {
 				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
@@ -39,13 +38,13 @@ export default class MyPlugin extends Plugin {
 		// This creates an icon in the left ribbon.
 		const addNoteIcon = this.addRibbonIcon('file-plus-2', 'Create note from clipboard', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			const folderArray = todayFolderStructure();
+			const folderArray = todayFolderStructure(true);
 			for (let i = 1; i <= folderArray.length; i++) {
 				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
 			}
 			console.log(`creating /${this.settings.rootFolder}/${folderArray.join('/')}`)
-			createNoteFromClipboard(vault, `/${this.settings.rootFolder}/${folderArray.join('/')}`);
+			createNote(vault, `/${this.settings.rootFolder}/${folderArray.join('/')}`, 'title');
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
@@ -69,6 +68,17 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				console.log(editor.getSelection());
 				editor.replaceSelection('Sample Editor Command');
+			},
+		});
+		this.addCommand({
+			id: 'transform-text',
+			name: 'Transform text',
+			editorCallback: (editor: Editor) => {
+				const selection = editor.getSelection();
+				console.log(`got ${selection}`);
+				let replaced = defangDomain(selection);
+				console.log(`replacing ${replaced}`);
+				editor.replaceSelection(replaced);
 			}
 		});
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
@@ -109,13 +119,14 @@ export default class MyPlugin extends Plugin {
 		});
 		this.app.workspace.on("editor-menu", (menu) => {
 			menu.addItem((item) => {
-				item.setTitle('test')
+				item.setTitle('Transform Text')
 				.onClick(() => {
-					const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-					console.log(view);
-					if (view) {
-						console.log('made it here!')
-						view.editor.replaceSelection(data['bio']);
+					const editor = this.app.workspace.activeEditor?.editor;
+					if (editor) {
+						const selection = editor.getSelection();
+						console.log(`got ${selection}`);
+						let replaced = defangDomain(selection);
+						editor.replaceSelection(replaced);
 					}
 				})
 			})
@@ -126,7 +137,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-
+		console.log('unloaded');
 	}
 
 	async loadSettings() {

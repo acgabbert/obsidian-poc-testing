@@ -6,3 +6,7 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+.callout[data-callout="bird-note"] {
+    --callout-color: 200, 200, 200;
+    --callout-icon: bird;
+}
