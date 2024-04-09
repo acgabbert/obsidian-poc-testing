@@ -1,12 +1,33 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
 .callout[data-callout="bird-note"] {
     --callout-color: 200, 200, 200;
     --callout-icon: bird;
+}
+.callout[data-callout="redbird-note"] {
+    --callout-color: 222, 93, 93;
+    --callout-icon: search-code;
+}
+.callout[data-callout="fingerprint-note"] {
+    --callout-color: 200, 200, 200;
+    --callout-icon: fingerprint;
+}
+.code__suggestion {
+    font-family: var(--font-monospace);
+    background-color: var(--background-modifier-hover);
+    padding: 3px;
+    font-size: x-small;
+    border-radius: 5px;
+}
+.code__suggestion_bottom {
+    font-family: var(--font-monospace);
+    background-color: var(--background-modifier-hover);
+    padding: 3px;
+    font-size: x-small;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.code__modal {
+    font-family: var(--font-monospace);
+    font-size: smaller;
+    max-height: 200px;
+    overflow: scroll;
 }
