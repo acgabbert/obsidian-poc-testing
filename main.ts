@@ -1,15 +1,7 @@
-import { App, Editor, EventRef, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Editor, EventRef, MarkdownView, Notice, Plugin } from 'obsidian';
+
+import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
 import { createFolderIfNotExists, createNote, defangDomain, todayFolderStructure } from 'src/utils';
-
-interface MyPluginSettings {
-	rootFolder: string;
-	rootFolderDropdown: string;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	rootFolder: '',
-	rootFolderDropdown: ''
-}
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
@@ -109,46 +101,5 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class MySettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	async display(): Promise<void> {
-		const {containerEl} = this;
-
-		containerEl.empty();
-		const vault = this.app.vault;
-		const subFolders = (await vault.adapter.list('')).folders;
-
-		new Setting(containerEl)
-			.setName('Root Folder Dropdown')
-			.setDesc('The folder to start searching from')
-			.addDropdown( (dropdown) => {
-				for (const subFolder in subFolders) {
-					dropdown.addOption(subFolder, subFolder);
-				}
-				dropdown.onChange(async (value) => {
-					this.plugin.settings.rootFolderDropdown = value;
-					await this.plugin.saveSettings();
-				});
-			});
-		new Setting(containerEl)
-			.setName('Root Folder')
-			.setDesc('The folder to start searching from')
-			.addText(text => text
-				.setPlaceholder('notes')
-				.setValue(this.plugin.settings.rootFolder)
-				.onChange(async (value) => {
-					this.plugin.settings.rootFolder = value;
-					await this.plugin.saveSettings();
-				})
-			);
 	}
 }
