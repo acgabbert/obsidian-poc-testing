@@ -1,7 +1,7 @@
 import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
 import { extractMacros, replaceMacros } from "./textUtils";
 
-export {ErrorModal, InputModal};
+export { CodeListModal, CodeModal, ErrorModal, InputModal };
 
 class InputModal extends Modal {
     input: Map<string, string>;
@@ -105,7 +105,7 @@ class CodeListModal extends SuggestModal<string> {
                 }
             })
         })
-        new CodeModal(this.app, result);
+        new CodeModal(this.app, result).open();
     }
 }
 
