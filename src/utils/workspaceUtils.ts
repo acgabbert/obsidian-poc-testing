@@ -78,7 +78,7 @@ class CodeListModal extends SuggestModal<string> {
     getSuggestions(query: string): string[] | Promise<string[]> {
         const keys = [...this.content.keys()];
         return keys.filter((item) =>
-            item.toLowerCase().includes(query.toLowerCase()) || this.content.get(item)?.includes(query.toLowerCase())
+            item.toLowerCase().includes(query.toLowerCase()) || this.content.get(item)?.toLowerCase().includes(query.toLowerCase())
         );
     }
 
