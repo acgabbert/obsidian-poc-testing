@@ -1,7 +1,7 @@
-import { Editor, EventRef, MarkdownView, Notice, Plugin } from 'obsidian';
+import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile } from 'obsidian';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
-import { createFolderIfNotExists, createNote, defangDomain, todayFolderStructure } from 'src/utils';
+import { addButtonContainer, addButtonToContainer, appendToEnd, createFolderIfNotExists, createNote, defangDomain, todayFolderStructure } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
@@ -56,12 +56,35 @@ export default class MyPlugin extends Plugin {
 			id: 'transform-text',
 			name: 'Transform text',
 			editorCallback: (editor: Editor) => {
+				console.log(editor.lastLine());
 				const selection = editor.getSelection();
 				console.log(`got ${selection}`);
 				let replaced = defangDomain(selection);
 				console.log(`replacing ${replaced}`);
 				editor.replaceSelection(replaced);
 			}
+		});
+
+		this.app.workspace.on('file-open', async (file: TFile) => {
+			const className = 'my-button-container';
+			const view = this.app.workspace.getActiveViewOfType(MarkdownView)?.containerEl;
+			const els = view?.getElementsByClassName(className);
+			if (els && els.length > 0) {
+				Array.from(els).forEach((element: HTMLObjectElement) => {
+					view?.removeChild(element);
+				})
+			}
+			const container = addButtonContainer(this.app.workspace, file, className);
+			if (!container) return;
+			const button = addButtonToContainer(container, 'Button!').onClick(() => {
+				new Notice('Button clicked!')
+			});
+			const button2 = addButtonToContainer(container, 'Button 2!').onClick(() => {
+				new Notice('Button clicked!')
+			});
+			const button3 = addButtonToContainer(container, 'Button 3!').onClick(() => {
+				new Notice('Button clicked!')
+			});
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin

@@ -1,7 +1,37 @@
-import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
+import { App, ButtonComponent, MarkdownView, Modal, Notice, Setting, SuggestModal, TFile, Workspace } from "obsidian";
 import { extractMacros, replaceMacros } from "./textUtils";
 
-export { CodeListModal, CodeModal, ErrorModal, InputModal };
+export { addButtonContainer, addButtonToContainer, CodeListModal, CodeModal, ErrorModal, InputModal };
+
+function addButtonContainer(workspace: Workspace, file: TFile, className: string, rootFolder?: string) {
+    const view = workspace.getActiveViewOfType(MarkdownView);
+    if (!view) return;
+    const container = view.containerEl;
+    if (!container) return;
+    const els = container.getElementsByClassName(className);
+    if (els && els.length > 0) {
+        Array.from(els).forEach((el: HTMLObjectElement) => {
+            container?.removeChild(el);
+        });
+    }
+    if (rootFolder && !file.path.includes(rootFolder)) {
+        console.log('File not in specified root folder');
+        return;
+    }
+    const header = container.querySelector('.view-header');
+    if (!header) return;
+    const newDiv = document.createElement('div');
+    newDiv.className = className;
+    container.insertAfter(newDiv, header)
+    return newDiv;
+}
+
+function addButtonToContainer(el: HTMLDivElement, buttonText: string) {
+    const button = new ButtonComponent(el)
+        .setButtonText(buttonText)
+        .setCta();
+    return button;
+}
 
 class InputModal extends Modal {
     input: Map<string, string>;
