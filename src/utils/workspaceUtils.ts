@@ -11,7 +11,7 @@ function addButtonContainer(workspace: Workspace, file: TFile, className: string
     const els = container.getElementsByClassName(className);
     if (els && els.length > 0) {
         Array.from(els).forEach((el: HTMLObjectElement) => {
-            container?.removeChild(el);
+            container.removeChild(el);
         });
     }
     if (rootFolder && !file.path.includes(rootFolder)) {

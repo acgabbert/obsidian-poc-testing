@@ -18,7 +18,8 @@ function appendToEnd(app: App, file: TFile, text: string) {
     if (!app) return;
     const vault = app.vault;
     const view = app.workspace.getActiveViewOfType(MarkdownView);
-    const editor = view?.editor;
+    if (!view) return;
+    const editor = view.editor;
     if (!editor || !vault || !file) return;
     vault.append(file, `\n${text}`);
     let lastLine = editor.lastLine();

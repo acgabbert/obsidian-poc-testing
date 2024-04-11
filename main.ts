@@ -68,10 +68,11 @@ export default class MyPlugin extends Plugin {
 		this.app.workspace.on('file-open', async (file: TFile) => {
 			const className = 'my-button-container';
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView)?.containerEl;
-			const els = view?.getElementsByClassName(className);
+			if (!view) return;
+			const els = view.getElementsByClassName(className);
 			if (els && els.length > 0) {
 				Array.from(els).forEach((element: HTMLObjectElement) => {
-					view?.removeChild(element);
+					view.removeChild(element);
 				})
 			}
 			const container = addButtonContainer(this.app.workspace, file, className);
