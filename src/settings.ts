@@ -1,6 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 import MyPlugin from "main";
+import { removeDotObsidian } from "./utils";
 
 export { DEFAULT_SETTINGS, MySettingTab };
 export type { MyPluginSettings };
@@ -8,11 +9,13 @@ export type { MyPluginSettings };
 interface MyPluginSettings {
 	rootFolder: string;
 	rootFolderDropdown: string;
+    codeFile: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	rootFolder: '',
-	rootFolderDropdown: ''
+	rootFolderDropdown: '',
+    codeFile: ''
 }
 
 class MySettingTab extends PluginSettingTab {
@@ -29,9 +32,12 @@ class MySettingTab extends PluginSettingTab {
 		containerEl.empty();
 		const vault = this.app.vault;
 		const subFolders = (await vault.adapter.list('')).folders;
+        let topLevelFiles = (await vault.adapter.list('')).files;
+        topLevelFiles = removeDotObsidian(topLevelFiles);
+
 
 		new Setting(containerEl)
-			.setName('Root Folder Dropdown')
+			.setName('Root folder dropdown')
 			.setDesc('The folder to start searching from')
 			.addDropdown( (dropdown) => {
 				for (const subFolder in subFolders) {
@@ -43,15 +49,17 @@ class MySettingTab extends PluginSettingTab {
 				});
 			});
 		new Setting(containerEl)
-			.setName('Root Folder')
-			.setDesc('The folder to start searching from')
-			.addText(text => text
-				.setPlaceholder('notes')
-				.setValue(this.plugin.settings.rootFolder)
-				.onChange(async (value) => {
-					this.plugin.settings.rootFolder = value;
-					await this.plugin.saveSettings();
-				})
-			);
+			.setName('Code file')
+			.setDesc("The file where you'll store your code snippets")
+            .addDropdown((dropdown) => {
+                topLevelFiles.forEach((file) => {
+                    dropdown.addOption(file, file.replace(".md", ""));
+                });
+                dropdown.setValue(this.plugin.settings.codeFile);
+                dropdown.onChange(async (value) => {
+                    this.plugin.settings.codeFile = value;
+                    await this.plugin.saveSettings();
+                })
+            })
 	}
 }

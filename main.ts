@@ -1,7 +1,7 @@
 import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile } from 'obsidian';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
-import { addButtonContainer, addButtonToContainer, appendToEnd, createFolderIfNotExists, createNote, defangDomain, todayFolderStructure } from 'src/utils';
+import { CodeListModal, addButtonContainer, addButtonToContainer, appendToEnd, createFolderIfNotExists, createNote, defangDomain, parseCodeBlocks, todayFolderStructure } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
@@ -36,6 +36,15 @@ export default class MyPlugin extends Plugin {
 			}
 			console.log(`creating /${this.settings.rootFolder}/${folderArray.join('/')}`)
 			createNote(vault, `/${this.settings.rootFolder}/${folderArray.join('/')}`, 'title');
+		});
+		const codeIcon = this.addRibbonIcon('shell', 'Copy code', async (evt: MouseEvent) => {
+			const codeFile = this.app.vault.getFileByPath(this.settings.codeFile);
+			if (!codeFile) return;
+			console.log(codeFile)
+			const code = parseCodeBlocks(await this.app.vault.read(codeFile))
+			if (!code) return;
+			console.log(code);
+			new CodeListModal(this.app, code).open();
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');

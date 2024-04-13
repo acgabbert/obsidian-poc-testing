@@ -99,10 +99,11 @@ class CodeListModal extends SuggestModal<string> {
     content: Map<string, string>;
     macros: Map<string, RegExp>;
 
-    constructor(app: App, content: Map<string, string>, macros: Map<string, RegExp>) {
+    constructor(app: App, content: Map<string, string>, macros?: Map<string, RegExp>) {
+        console.log('constructing modal')
         super(app);
         this.content = content;
-        this.macros = macros;
+        if (macros) this.macros = macros;
     }
 
     getSuggestions(query: string): string[] | Promise<string[]> {
