@@ -1,14 +1,12 @@
 import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
-import { extractMacros, extractMatches, replaceMacros } from "./textUtils";
+import { constructMacroRegex, extractMacros, extractMatches, replaceMacros } from "./textUtils";
 import { getActiveNoteContent } from "./workspaceUtils";
 
 export { CodeListModal, CodeModal, ErrorModal, InputModal, OldInputModal };
 
-// check if a macro is supported -> if so parse the note for values matching
 const supportedMacros = new Map<RegExp, RegExp>();
-supportedMacros.set(/user(name)?/gi, /user(?:\s*named?)?(?:[:=]\s*|\s+)([^\}\s]+)/gi); // username
-supportedMacros.set(/(host|computer|comp)(name)?/gi, /(?:host|computer|comp)(?:name)?(?:[:=]\s*|\s+)([^\}\s]+)/gi); // hostname
-// if not, treat it like normal
+supportedMacros.set(/user(name)?/gi, constructMacroRegex(/user(?:\s*named?)?/)); // username
+supportedMacros.set(/(host|computer|comp)(name)?/gi, constructMacroRegex(/(?:host|computer|comp)(?:name)?/)); // hostname/computername
 
 interface Macro {
     replace: string;
