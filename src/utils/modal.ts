@@ -79,9 +79,7 @@ class InputModal extends Modal {
             let match = false;
             this.supportedMacros.forEach((value, key) => {
                 if (!key.test(contentMacro) || !activeNote) return;
-                console.log(`testing matches with ${activeNote}, ${value}`);
                 const matches = extractMatches(activeNote, value);
-                console.log(`matches: ${matches}`)
                 if (!(matches.length > 0)) return;
                 match = true;
                 contentEl.createEl("h2", {text: contentMacro});
@@ -91,7 +89,8 @@ class InputModal extends Modal {
                     .addDropdown((dropdown) => {
                         matches.forEach((match) => {
                             dropdown.addOption(match, match);
-                        })
+                        });
+                        dropdown.addOption("*", "*");
                         this.replacements.set(contentMacro, dropdown.getValue());
                         dropdown.onChange((value) => {
                             this.replacements.set(contentMacro, value);
@@ -101,6 +100,7 @@ class InputModal extends Modal {
                     .setName(contentMacro)
                     .setDesc("Manual selection (overrides dropdown)")
                     .addText((text) => {
+                        text.setPlaceholder("*");
                         text.onChange((input) => {
                             this.replacements.set(contentMacro, input);
                         })
@@ -111,6 +111,8 @@ class InputModal extends Modal {
             new Setting(contentEl)
                 .setName(contentMacro)
                 .addText((text) => {
+                    text.setPlaceholder("*");
+                    this.replacements.set(contentMacro, "*");
                     text.onChange((input) => {
                         this.replacements.set(contentMacro, input);
                     })
