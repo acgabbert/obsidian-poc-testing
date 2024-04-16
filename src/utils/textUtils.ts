@@ -1,10 +1,11 @@
 import { App, Notice, TFile } from "obsidian";
-import { InputModal } from "./workspaceUtils";
+import { OldInputModal } from "./modal";
 export {
     addUniqueValuesToArray,
     defangIp,
     defangDomain,
     extractMacros,
+    extractMatches,
     findFirstByRegex,
     friendlyDatetime,
     lowerSha256,
@@ -133,7 +134,7 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
      * @param note the note to which it will be inserted
      * @param contentMacro the string to replace content with @default "{{content}}"
      */
-    var template_replaced = template.replaceAll("{{title}}", note.name.slice(0, -3));
+    let template_replaced = template.replaceAll("{{title}}", note.name.slice(0, -3));
     const dateTime = localDateTime().split(" ");
     template_replaced = template_replaced.replaceAll("{{date}}", dateTime[0]);
     template_replaced = template_replaced.replaceAll("{{time}}", dateTime[1]);
@@ -148,7 +149,12 @@ function extractMacros(text: string): string[] {
      * @returns a unique list of macros in the text
      */
     const macroRegex = /(\{\{[^\}]+\}\})/g;
-    let matches = text.matchAll(macroRegex);
+    const matches = text.matchAll(macroRegex);
+    return addUniqueValuesToArray([], matches);
+}
+
+function extractMatches(text: string, pattern: RegExp): string[] {
+    const matches = text.matchAll(pattern);
     return addUniqueValuesToArray([], matches);
 }
 
@@ -185,7 +191,7 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
         let matchArray = extractMacros(text);
         let userInput = new Map<string, string>();
         if (matchArray.length > 0) {
-            new InputModal(app, matchArray, (input) => {
+            new OldInputModal(app, matchArray, (input) => {
                 input.forEach(async (value, key) => {
                     userInput.set(`${key}`, value);
                 });
@@ -211,7 +217,7 @@ function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExp
      * @param values a set of regex matches
      * @returns the passed array with unique values added
      */
-    let valueArray = [...values];
+    const valueArray = [...values];
     valueArray.forEach((match) => {
         if (!array.includes(match[1])) {
             array.push(match[1]);
@@ -226,9 +232,9 @@ function parseCodeBlocks(content: string): Map<string, string> {
      * @param content file content
      * @returns a mapping of headers to code blcok content
      */
-    let retval = new Map();
+    const retval = new Map();
     const codeBlockRegex = /#+\s+(.+)$\n+```\w*\n(((?!^```\n).|\n)*)\n^```$/gm;
-    let matchArray = [...content.matchAll(codeBlockRegex)];
+    const matchArray = [...content.matchAll(codeBlockRegex)];
     matchArray.forEach((match) => {
         if (!retval.has(match[1])) {
             retval.set(match[1], match[2]);
