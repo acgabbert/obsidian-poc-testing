@@ -244,7 +244,7 @@ function parseCodeBlocks(content: string): Map<string, string> {
     return retval;
 }
 
-export const macroSeparator = "(?:[:=]\\s*|\\s+)";
+export const macroSeparator = "(?:\\s*[:=]\\s*|\\s+)";
 export const macroValue = "([^\\}\\s]+)";
 function constructMacroRegex(macroRegex: string | RegExp): RegExp {
     if (macroRegex instanceof RegExp) macroRegex = macroRegex.source;
