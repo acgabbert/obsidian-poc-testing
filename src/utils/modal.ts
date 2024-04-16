@@ -7,6 +7,7 @@ export { CodeListModal, CodeModal, ErrorModal, InputModal, OldInputModal };
 export const supportedMacros = new Map<RegExp, RegExp>();
 supportedMacros.set(/user(name)?/gi, constructMacroRegex(/user(?:\s*named?)?/)); // username
 supportedMacros.set(/(host|computer|comp)(name)?/gi, constructMacroRegex(/(?:host|computer|comp)(?:name)?/)); // hostname/computername
+supportedMacros.set(/(hash|sha256|sha)/gi, constructMacroRegex(/(?:hash|sha256|sha)/)); // hash
 
 interface Macro {
     replace: string;
