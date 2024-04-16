@@ -20,12 +20,13 @@ interface Code {
 
 class CodeListModal extends SuggestModal<string> {
     content: Map<string, string>;
-    macros: Macro[];
+    macros: Map<RegExp, RegExp>;
 
-    constructor(app: App, content: Map<string, string>, macros?: Macro[]) {
+    constructor(app: App, content: Map<string, string>, macros?: Map<RegExp, RegExp>) {
         console.log('constructing modal')
         super(app);
         this.content = content;
+        this.macros = supportedMacros;
         if (macros) this.macros = macros;
     }
 
@@ -66,12 +67,15 @@ class InputModal extends Modal {
     content: string;
     macros: string[];
     replacements: Map<string, string>;
+    supportedMacros: Map<RegExp, RegExp>;
 
-    constructor(app: App, content: string, macros: string[]) {
+    constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp>) {
         super(app);
         this.content = content;
         this.macros = macros;
         this.replacements = new Map();
+        this.supportedMacros = supportedMacros;
+        if (passedMacros) this.supportedMacros = passedMacros;
     }
 
     onOpen(): void {
@@ -81,7 +85,7 @@ class InputModal extends Modal {
         contentEl.createEl("h1", {text: "Input Parameters:"});
         this.macros.forEach((contentMacro) => {
             let match = false;
-            supportedMacros.forEach((value, key) => {
+            this.supportedMacros.forEach((value, key) => {
                 if (!key.test(contentMacro) || !activeNote) return;
                 console.log(`testing matches with ${activeNote}, ${value}`);
                 const matches = extractMatches(activeNote, value);
