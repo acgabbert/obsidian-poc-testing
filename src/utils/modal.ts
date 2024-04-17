@@ -8,7 +8,7 @@ export const supportedMacros = new Map<RegExp, RegExp>();
 supportedMacros.set(/user(name)?/gi, constructMacroRegex(/user(?:\s*named?)?/)); // username
 supportedMacros.set(/(host|computer|comp)(name)?/gi, constructMacroRegex(/(?:host|computer|comp)\s*(?:named?)?/)); // hostname/computername
 supportedMacros.set(/(hash|sha256|sha)/gi, constructMacroRegex(/(?:hash|sha\s*256|sha)/)); // hash
-supportedMacros.set(/(file(path)?|path)(name)?/gi, constructMacroRegex(/(?:(?:file(?:path)?|path)\s*(?:name)?)/)); // file
+supportedMacros.set(/(file(path)?|path)(name)?/gi, constructMacroRegex(/(?:(?:file\s*(?:path)?|path)\s*(?:name)?)/)); // file
 
 class CodeListModal extends SuggestModal<string> {
     content: Map<string, string>;
