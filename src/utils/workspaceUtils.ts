@@ -32,7 +32,8 @@ function addButtonToContainer(el: HTMLDivElement, buttonText: string) {
     return button;
 }
 
-function getActiveNoteContent(app: App) {
-    const view = app.workspace.getActiveViewOfType(MarkdownView);
-    return view?.data;
+async function getActiveNoteContent(app: App) {
+    const file = app.workspace.getActiveFile();
+    if (!file) return null;
+    return await app.vault.cachedRead(file);
 }

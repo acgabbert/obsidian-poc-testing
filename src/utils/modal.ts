@@ -70,10 +70,10 @@ class InputModal extends Modal {
         if (passedMacros) this.supportedMacros = passedMacros;
     }
 
-    onOpen(): void {
+    async onOpen(): Promise<void> {
         const {contentEl} = this;
         let result = this.content;
-        let activeNote = getActiveNoteContent(this.app);
+        let activeNote = await getActiveNoteContent(this.app);
         contentEl.createEl("h1", {text: "Input Parameters:"});
         this.macros.forEach((contentMacro) => {
             let match = false;
