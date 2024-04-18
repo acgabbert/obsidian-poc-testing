@@ -232,7 +232,6 @@ function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExp
     const valueArray = [...values];
     valueArray.forEach((match) => {
         if (!array.includes(match[1])) {
-            console.log(`match: ${match[1]}`)
             array.push(match[1]);
         }
     });

@@ -58,13 +58,9 @@ export class PluginSidebar extends ItemView {
 
     async updateView(file: TFile) {
         const fileContent = await this.app.vault.cachedRead(file);
-        console.log(`checking indicator matches in the active file:\n${fileContent}`);
         this.ips = extractMatches(fileContent, IP_REGEX);
-        console.log('ips done');
         this.domains = extractMatches(fileContent, DOMAIN_REGEX);
-        console.log('domains done');
         this.hashes = extractMatches(fileContent, HASH_REGEX);
-        console.log('hashes done');
         const container = this.containerEl.children[1];
         const els = container.getElementsByClassName('sidebar-list-item');
         if (els && els.length > 0) {
