@@ -20,9 +20,9 @@ export {
 }
 
 // regex for possibly defanged values
-export const IP_REGEX = /(\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3})/gi
-export const DOMAIN_REGEX = /((([a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}(\[?\.\]?)?)+)\[?\.\]?((xn--)?([a-z0-9\-]{2,61}|[a-z0-9-]{2,30}\[?\.\]?[a-z]{2,})))/g;
-export const HASH_REGEX = /[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|/gi
+export const IP_REGEX = /(\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3})/gi;
+export const DOMAIN_REGEX = /((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.|\[\.\]))+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?=\.?)\b)/gi;
+export const HASH_REGEX = /(?:^|[^a-fA-F0-9]*)([a-fA-F0-9]{64}|[a-fA-F0-9]{40}|[a-fA-F0-9]{32})/gi;
 
 function todayLocalDate(): string {
     /**
@@ -232,6 +232,7 @@ function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExp
     const valueArray = [...values];
     valueArray.forEach((match) => {
         if (!array.includes(match[1])) {
+            console.log(`match: ${match[1]}`)
             array.push(match[1]);
         }
     });
