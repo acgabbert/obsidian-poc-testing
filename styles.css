@@ -44,3 +44,11 @@
     display: table-cell;
     text-align: center;
 }
+
+.sidebar-container {
+    user-select: text;
+}
+
+.sidebar-button {
+    transform: scale(0.6, 0.6);
+}

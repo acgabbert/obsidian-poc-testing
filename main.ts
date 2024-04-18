@@ -1,8 +1,18 @@
 import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
-import { CodeListModal, addButtonContainer, addButtonToContainer, appendToEnd, createFolderIfNotExists, createNote, defangDomain, parseCodeBlocks, todayFolderStructure } from 'src/utils';
-import { PluginSidebar, VIEW_TYPE } from 'src/utils/sidebar';
+import {
+	CodeListModal,
+	addButtonContainer,
+	addButtonToContainer,
+	createFolderIfNotExists,
+	createNote,
+	defangDomain,
+	parseCodeBlocks,
+	PluginSidebar,
+	todayFolderStructure,
+	VIEW_TYPE
+} from 'src/utils';
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
