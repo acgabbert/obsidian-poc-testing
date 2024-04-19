@@ -1,4 +1,4 @@
-import { App, Setting, TFile, Vault } from 'obsidian';
+import { App, TFile, Vault } from 'obsidian';
 
 export { 
     checkFolderExistsRecursive,
