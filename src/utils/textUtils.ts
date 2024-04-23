@@ -18,6 +18,7 @@ export {
     todayLocalDate,
     todayFolderStructure
 }
+export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/\s]+[\\\/]([^\\\/\n"|]+[\\\/]?)+(\.\w+)?)/gi;
 
 function todayLocalDate(): string {
     /**
