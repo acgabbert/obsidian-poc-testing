@@ -18,6 +18,11 @@ export {
     todayLocalDate,
     todayFolderStructure
 }
+
+// regex for possibly defanged values
+export const IP_REGEX = /(\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3})/gi;
+export const DOMAIN_REGEX = /((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.|\[\.\]))+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?=\.?)\b)/gi;
+export const HASH_REGEX = /(?:^|[^a-fA-F0-9]*)([a-fA-F0-9]{64}|[a-fA-F0-9]{40}|[a-fA-F0-9]{32})/gi;
 export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/\s]+[\\\/]([^\\\/\n"|]+[\\\/]?)+(\.\w+)?)/gi;
 
 function todayLocalDate(): string {
