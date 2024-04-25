@@ -23,6 +23,10 @@ export class PluginSidebar extends ItemView {
     searchSites: Map<string, string>;
     sidebarTitle: string;
 
+    ipRegex: RegExp;
+    hashRegex: RegExp;
+    domainRegex: RegExp;
+
     private sidebarContainerClass = "sidebar-container tree-item";
     private listClass = "sidebar-list-item";
     private listItemClass = this.listClass + " tree-item-self";
@@ -36,6 +40,9 @@ export class PluginSidebar extends ItemView {
         this.registerOpenFile();
         this.searchSites = defaultSearchSites;
         this.sidebarTitle = 'Extracted Indicators';
+        this.ipRegex = IP_REGEX;
+        this.hashRegex = HASH_REGEX;
+        this.domainRegex = DOMAIN_REGEX;
         if (searchSites) this.searchSites = searchSites;
     }
 
@@ -114,9 +121,9 @@ export class PluginSidebar extends ItemView {
 
     async updateView(file: TFile) {
         const fileContent = await this.app.vault.cachedRead(file);
-        this.ips = extractMatches(fileContent, IP_REGEX);
-        this.domains = extractMatches(fileContent, DOMAIN_REGEX);
-        this.hashes = extractMatches(fileContent, HASH_REGEX);
+        this.ips = extractMatches(fileContent, this.ipRegex);
+        this.domains = extractMatches(fileContent, this.domainRegex);
+        this.hashes = extractMatches(fileContent, this.hashRegex);
         const container = this.containerEl.children[1];
         this.clearSidebar(container);
         
