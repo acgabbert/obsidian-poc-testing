@@ -56,12 +56,24 @@ export class PluginSidebar extends ItemView {
         );
     }
 
-    async updateView(file: TFile) {
-        const fileContent = await this.app.vault.cachedRead(file);
-        this.ips = extractMatches(fileContent, IP_REGEX);
-        this.domains = extractMatches(fileContent, DOMAIN_REGEX);
-        this.hashes = extractMatches(fileContent, HASH_REGEX);
-        const container = this.containerEl.children[1];
+    addIndicatorEl(parentEl: HTMLElement, indicator: string): void {
+        if (!indicator) return;
+        const el = parentEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
+        el.createEl("td", {cls: this.tdClass, text: indicator});
+        const buttonEl = el.createEl("tr", {cls: this.tableClass});
+        new ButtonComponent(buttonEl)
+            .setButtonText('VT')
+            .setClass('sidebar-button');
+        new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
+            .setButtonText('IPDB')
+            .setClass('sidebar-button');
+        new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
+            .setButtonText('Google')
+            .setClass('sidebar-button');
+        return;
+    }
+
+    clearSidebar(container: Element): void {
         const els = container.getElementsByClassName(this.listClass);
         if (els && els.length > 0) {
             Array.from(els).forEach((el: HTMLObjectElement) => {
@@ -70,43 +82,25 @@ export class PluginSidebar extends ItemView {
                 } catch { }
             });
         }
+        return;
+    }
+
+    async updateView(file: TFile) {
+        const fileContent = await this.app.vault.cachedRead(file);
+        this.ips = extractMatches(fileContent, IP_REGEX);
+        this.domains = extractMatches(fileContent, DOMAIN_REGEX);
+        this.hashes = extractMatches(fileContent, HASH_REGEX);
+        const container = this.containerEl.children[1];
+        this.clearSidebar(container);
         
         this.ips.forEach((ip) => {
-            console.log(`ip: ${ip}`);
-            if (!ip) return;
-            const el = this.ipEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
-            el.createEl("td", {cls: this.tdClass, text: ip});
-            const buttonEl = el.createEl("tr", {cls: this.tableClass});
-            const button = new ButtonComponent(buttonEl)
-                .setButtonText('VT')
-                .setClass('sidebar-button');
-            return button;
+            this.addIndicatorEl(this.ipEl, ip);
         });
         this.domains.forEach((domain) => {
-            console.log(`domain: ${domain}`);
-            if (!domain) return;
-            const el = this.domainEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
-            el.createEl("td", {cls: this.tdClass, text: domain});
-            const buttonEl = el.createEl("tr", {cls: this.tableClass});
-            const vtButton = new ButtonComponent(buttonEl.createEl("td"))
-                .setButtonText('VT')
-                .setClass('sidebar-button');
-            const ipdbButton = new ButtonComponent(buttonEl.createEl("td"))
-                .setButtonText('IPDB')
-                .setClass('sidebar-button');
-            const googleButton = new ButtonComponent(buttonEl.createEl("td"))
-                .setButtonText('Google')
-                .setClass('sidebar-button');
+            this.addIndicatorEl(this.domainEl, domain);
         });
         this.hashes.forEach((hash) => {
-            console.log(`hash: ${hash}`);
-            if (!hash) return;
-            const el = this.hashEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
-            el.createEl("td", {cls: this.tdClass, text: hash});
-            const buttonEl = el.createEl("tr", {cls: this.tableClass});
-            const button = new ButtonComponent(el)
-                .setButtonText('VT')
-                .setClass('sidebar-button');
+            this.addIndicatorEl(this.hashEl, hash);
         });
     }
 
