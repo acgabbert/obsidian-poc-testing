@@ -21,6 +21,7 @@ export class PluginSidebar extends ItemView {
     domainEl: HTMLDivElement;
     hashEl: HTMLDivElement;
     searchSites: Map<string, string>;
+    sidebarTitle: string;
 
     private sidebarContainerClass = "sidebar-container tree-item";
     private listClass = "sidebar-list-item";
@@ -34,6 +35,7 @@ export class PluginSidebar extends ItemView {
         this.registerActiveFileListener();
         this.registerOpenFile();
         this.searchSites = defaultSearchSites;
+        this.sidebarTitle = 'Extracted Indicators';
         if (searchSites) this.searchSites = searchSites;
     }
 
@@ -48,7 +50,7 @@ export class PluginSidebar extends ItemView {
     protected async onOpen(): Promise<void> {
         const container = this.containerEl.children[1];
         container.empty();
-        container.createEl("h4", {text: "Extracted indicators!"});
+        container.createEl("h4", {text: this.sidebarTitle});
         const ipContainer = container.createDiv({cls: this.sidebarContainerClass});
         ipContainer.createEl("h4", {cls: "tree-item-self is-clickable mod-collapsible", text: "IPs"});
         this.ipEl = ipContainer.createDiv({cls: "tree-item-children"});
