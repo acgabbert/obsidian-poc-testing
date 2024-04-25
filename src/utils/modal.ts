@@ -124,6 +124,15 @@ class InputModal extends Modal {
                     this.close();
                 })
             })
+        
+        this.scope.register([], "Enter", (evt: KeyboardEvent) => {
+            if (evt.isComposing) {
+                return;
+            }
+            evt.preventDefault();
+            evt.stopPropagation();
+            this.close();
+        })
     }
 
     onClose(): void {
