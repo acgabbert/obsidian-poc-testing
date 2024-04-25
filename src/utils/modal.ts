@@ -1,5 +1,5 @@
 import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
-import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, replaceMacros } from "./textUtils";
+import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, MACRO_REGEX, replaceMacros } from "./textUtils";
 import { getActiveNoteContent } from "./workspaceUtils";
 
 export { CodeListModal, CodeModal, ErrorModal, InputModal, OldInputModal };
@@ -72,20 +72,21 @@ class InputModal extends Modal {
 
     async onOpen(): Promise<void> {
         const {contentEl} = this;
-        let result = this.content;
         let activeNote = await getActiveNoteContent(this.app);
         contentEl.createEl("h1", {text: "Input Parameters:"});
         this.macros.forEach((contentMacro) => {
+            const macroWord = MACRO_REGEX.exec(contentMacro)![2].toLowerCase();
+            const displayMacro = macroWord.charAt(0).toUpperCase() + macroWord.slice(1);
             let match = false;
             this.supportedMacros.forEach((value, key) => {
                 if (!key.test(contentMacro) || !activeNote) return;
                 const matches = extractMatches(activeNote, value);
                 if (!(matches.length > 0)) return;
                 match = true;
-                contentEl.createEl("h2", {text: contentMacro});
+                contentEl.createEl("h2", {text: displayMacro});
                 new Setting(contentEl)
-                    .setName(contentMacro)
-                    .setDesc("Values parsed from the active note")
+                    .setName(`${displayMacro} values parsed from the active note`)
+                    //.setDesc("Values parsed from the active note")
                     .addDropdown((dropdown) => {
                         matches.forEach((match) => {
                             dropdown.addOption(match, match);
@@ -97,15 +98,14 @@ class InputModal extends Modal {
                         })
                     })
                 new Setting(contentEl)
-                    .setName(contentMacro)
-                    .setDesc("Manual selection (overrides dropdown)")
+                    .setName(`${displayMacro} manual selection (overrides dropdown)`)
+                    //.setDesc("Manual selection (overrides dropdown)")
                     .addText((text) => {
                         text.setPlaceholder("*");
                         text.onChange((input) => {
                             this.replacements.set(contentMacro, input);
                         })
                     })
-                //result = result.replaceAll(value, contentMacro);
             })
             if (match) return;
             new Setting(contentEl)

@@ -149,14 +149,14 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
     return template_replaced;
 }
 
+export const MACRO_REGEX = /(\{\{([^\}]+)\}\})/g;
 function extractMacros(text: string): string[] {
     /**
      * Extract macros 
      * @param text
      * @returns a unique list of macros in the text
      */
-    const macroRegex = /(\{\{[^\}]+\}\})/g;
-    const matches = text.matchAll(macroRegex);
+    const matches = text.matchAll(MACRO_REGEX);
     return addUniqueValuesToArray([], matches);
 }
 
