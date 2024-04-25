@@ -160,9 +160,25 @@ function extractMacros(text: string): string[] {
     return addUniqueValuesToArray([], matches);
 }
 
-function extractMatches(text: string, pattern: RegExp): string[] {
-    const matches = text.matchAll(pattern);
-    return addUniqueValuesToArray([], matches);
+function extractMatches(text: string, pattern: RegExp | RegExp[]): string[] {
+    /**
+     * Extracts matches for all of the given regular expressions.
+     * @param text the text to check against
+     * @param pattern the regex pattern(s) to evaluate
+     * @returns an array of strings that matched the given regex
+     */
+    if (Array.isArray(pattern)) {
+        const matches = new Array();
+        pattern.forEach((value) => {
+            console.log(`checking matches for ${value}`);
+            addUniqueValuesToArray(matches, text.matchAll(value));
+        });
+        return matches;
+    } else {
+        console.log(`checking matches for ${pattern}`);
+        const matches = text.matchAll(pattern);
+        return addUniqueValuesToArray([], matches);
+    }
 }
 
 function replaceMacros(text: string, replacements: Map<string, string>): string {
