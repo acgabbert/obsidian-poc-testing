@@ -14,6 +14,8 @@ export class PluginSidebar extends ItemView {
     private sidebarContainerClass = "sidebar-container tree-item";
     private listClass = "sidebar-list-item";
     private listItemClass = this.listClass + " tree-item-self";
+    private tableClass = "sidebar-table-row";
+    private tdClass = "sidebar-table-item";
 
     constructor(leaf: WorkspaceLeaf) {
         super(leaf);
@@ -72,8 +74,10 @@ export class PluginSidebar extends ItemView {
         this.ips.forEach((ip) => {
             console.log(`ip: ${ip}`);
             if (!ip) return;
-            const el = this.ipEl.createDiv({cls: this.listItemClass}).createDiv({cls: "tree-item-inner", text: ip});
-            const button = new ButtonComponent(el)
+            const el = this.ipEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
+            el.createEl("td", {cls: this.tdClass, text: ip});
+            const buttonEl = el.createEl("tr", {cls: this.tableClass});
+            const button = new ButtonComponent(buttonEl)
                 .setButtonText('VT')
                 .setClass('sidebar-button');
             return button;
@@ -81,12 +85,28 @@ export class PluginSidebar extends ItemView {
         this.domains.forEach((domain) => {
             console.log(`domain: ${domain}`);
             if (!domain) return;
-            this.domainEl.createDiv({cls: this.listItemClass}).createDiv({cls: "tree-item-inner", text: domain});
+            const el = this.domainEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
+            el.createEl("td", {cls: this.tdClass, text: domain});
+            const buttonEl = el.createEl("tr", {cls: this.tableClass});
+            const vtButton = new ButtonComponent(buttonEl.createEl("td"))
+                .setButtonText('VT')
+                .setClass('sidebar-button');
+            const ipdbButton = new ButtonComponent(buttonEl.createEl("td"))
+                .setButtonText('IPDB')
+                .setClass('sidebar-button');
+            const googleButton = new ButtonComponent(buttonEl.createEl("td"))
+                .setButtonText('Google')
+                .setClass('sidebar-button');
         });
         this.hashes.forEach((hash) => {
             console.log(`hash: ${hash}`);
             if (!hash) return;
-            this.hashEl.createDiv({cls: this.listItemClass}).createDiv({cls: "tree-item-inner", text: hash});
+            const el = this.hashEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
+            el.createEl("td", {cls: this.tdClass, text: hash});
+            const buttonEl = el.createEl("tr", {cls: this.tableClass});
+            const button = new ButtonComponent(el)
+                .setButtonText('VT')
+                .setClass('sidebar-button');
         });
     }
 
