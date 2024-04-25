@@ -21,9 +21,9 @@ export {
 
 // regex for possibly defanged values
 export const IP_REGEX = /(\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3})/gi;
-export const DOMAIN_REGEX = /((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.|\[\.\]))+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?=\.?)\b)/gi;
+export const DOMAIN_REGEX = /((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.|\[\.\]))+[a-zA-Z][a-zA-Z0-9-]{0,61}[a-zA-Z](?=\.?)\b)/gi;
 export const HASH_REGEX = /(?:^|[^a-fA-F0-9]*)([a-fA-F0-9]{64}|[a-fA-F0-9]{40}|[a-fA-F0-9]{32})/gi;
-export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/\s]+[\\\/]([^\\\/\n"|]+[\\\/]?)+(\.\w+)?)/gi;
+export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/]+[\\\/]([^\\\/\n"|]+[\\\/]?)+(\.\w+)?)/gi;
 
 function todayLocalDate(): string {
     /**
@@ -77,7 +77,7 @@ function defangDomain(text: string): string {
      * @returns input string with domains defanged
      */
     const httpString = /http(s?):\/\//g;
-    const anyDomain = /(([a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.?)+)\.((xn--)?([a-z0-9\-]{2,61}|[a-z0-9-]{2,30}\.[a-z]{2,}))/g;
+    const anyDomain = /(([a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.?)+)\.((xn--)?([a-z][a-z0-9\-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/g;
     let retval = text.replaceAll(httpString, "hxxp$1[://]");
     retval = retval.replaceAll(anyDomain, "$1[.]$3");
     return retval;
@@ -149,26 +149,36 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
     return template_replaced;
 }
 
+export const MACRO_REGEX = /(\{\{([^\}]+)\}\})/g;
 function extractMacros(text: string): string[] {
     /**
      * Extract macros in the format {{macro}}
      * @param text
      * @returns a unique list of macros in the text
      */
-    const macroRegex = /(\{\{[^\}]+\}\})/g;
-    const matches = text.matchAll(macroRegex);
+    const matches = text.matchAll(MACRO_REGEX);
     return addUniqueValuesToArray([], matches);
 }
 
-function extractMatches(text: string, pattern: RegExp): string[] {
+function extractMatches(text: string, pattern: RegExp | RegExp[]): string[] {
     /**
-     * Extract matches from the text for a given regex
-     * @param text
-     * @param pattern
-     * @returns an array of matches
+     * Extracts matches for all of the given regular expressions.
+     * @param text the text to check against
+     * @param pattern the regex pattern(s) to evaluate
+     * @returns an array of strings that matched the given regex
      */
-    const matches = text.matchAll(pattern);
-    return addUniqueValuesToArray([], matches);
+    if (Array.isArray(pattern)) {
+        const matches = new Array();
+        pattern.forEach((value) => {
+            console.log(`checking matches for ${value}`);
+            addUniqueValuesToArray(matches, text.matchAll(value));
+        });
+        return matches;
+    } else {
+        console.log(`checking matches for ${pattern}`);
+        const matches = text.matchAll(pattern);
+        return addUniqueValuesToArray([], matches);
+    }
 }
 
 function replaceMacros(text: string, replacements: Map<string, string>): string {

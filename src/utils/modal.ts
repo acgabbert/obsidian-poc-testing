@@ -1,20 +1,20 @@
 import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
-import { constructMacroRegex, extractMacros, extractMatches, replaceMacros } from "./textUtils";
+import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, MACRO_REGEX, replaceMacros } from "./textUtils";
 import { getActiveNoteContent } from "./workspaceUtils";
 
 export { CodeListModal, CodeModal, ErrorModal, InputModal, OldInputModal };
 
-export const supportedMacros = new Map<RegExp, RegExp>();
-supportedMacros.set(/user(name)?/gi, constructMacroRegex(/user(?:\s*named?)?/)); // username
-supportedMacros.set(/(host|computer|comp)(name)?/gi, constructMacroRegex(/(?:host|computer|comp)\s*(?:named?)?/)); // hostname/computername
-supportedMacros.set(/(hash|sha256|sha)/gi, constructMacroRegex(/(?:hash|sha\s*256|sha)/)); // hash
-supportedMacros.set(/(file(path)?|path)(name)?/gi, constructMacroRegex(/(?:(?:file\s*(?:path)?|path)\s*(?:name)?)/)); // file
+export const supportedMacros = new Map<RegExp, RegExp[]>();
+supportedMacros.set(/user(name)?/gi, new Array(constructMacroRegex(/user(?:\s*named?)?/))); // username
+supportedMacros.set(/(host|computer|comp)(name)?/gi, new Array(constructMacroRegex(/(?:host|computer|comp)\s*(?:named?)?/))); // hostname/computername
+supportedMacros.set(/(hash|sha256|sha)/gi, new Array(constructMacroRegex(/(?:hash|sha\s*256|sha)/))); // hash
+supportedMacros.set(/(file(path)?|path)(name)?/gi, new Array(FILE_REGEX, constructMacroRegex(/(?:(?:file\s*(?:path)?|path)\s*(?:name)?)/))); // file
 
 class CodeListModal extends SuggestModal<string> {
     content: Map<string, string>;
-    macros: Map<RegExp, RegExp>;
+    macros: Map<RegExp, RegExp[]>;
 
-    constructor(app: App, content: Map<string, string>, macros?: Map<RegExp, RegExp>) {
+    constructor(app: App, content: Map<string, string>, macros?: Map<RegExp, RegExp[]>) {
         console.log('constructing modal')
         super(app);
         this.content = content;
@@ -59,9 +59,9 @@ class InputModal extends Modal {
     content: string;
     macros: string[];
     replacements: Map<string, string>;
-    supportedMacros: Map<RegExp, RegExp>;
+    supportedMacros: Map<RegExp, RegExp[]>;
 
-    constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp>) {
+    constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp[]>) {
         super(app);
         this.content = content;
         this.macros = macros;
@@ -72,20 +72,21 @@ class InputModal extends Modal {
 
     async onOpen(): Promise<void> {
         const {contentEl} = this;
-        let result = this.content;
         let activeNote = await getActiveNoteContent(this.app);
         contentEl.createEl("h1", {text: "Input Parameters:"});
         this.macros.forEach((contentMacro) => {
+            const macroWord = MACRO_REGEX.exec(contentMacro)![2].toLowerCase();
+            const displayMacro = macroWord.charAt(0).toUpperCase() + macroWord.slice(1);
             let match = false;
             this.supportedMacros.forEach((value, key) => {
                 if (!key.test(contentMacro) || !activeNote) return;
                 const matches = extractMatches(activeNote, value);
                 if (!(matches.length > 0)) return;
                 match = true;
-                contentEl.createEl("h2", {text: contentMacro});
+                contentEl.createEl("h2", {text: displayMacro});
                 new Setting(contentEl)
-                    .setName(contentMacro)
-                    .setDesc("Values parsed from the active note")
+                    .setName(`${displayMacro} values parsed from the active note`)
+                    //.setDesc("Values parsed from the active note")
                     .addDropdown((dropdown) => {
                         matches.forEach((match) => {
                             dropdown.addOption(match, match);
@@ -97,15 +98,14 @@ class InputModal extends Modal {
                         })
                     })
                 new Setting(contentEl)
-                    .setName(contentMacro)
-                    .setDesc("Manual selection (overrides dropdown)")
+                    .setName(`${displayMacro} manual selection (overrides dropdown)`)
+                    //.setDesc("Manual selection (overrides dropdown)")
                     .addText((text) => {
                         text.setPlaceholder("*");
                         text.onChange((input) => {
                             this.replacements.set(contentMacro, input);
                         })
                     })
-                //result = result.replaceAll(value, contentMacro);
             })
             if (match) return;
             new Setting(contentEl)
@@ -124,6 +124,15 @@ class InputModal extends Modal {
                     this.close();
                 })
             })
+        
+        this.scope.register([], "Enter", (evt: KeyboardEvent) => {
+            if (evt.isComposing) {
+                return;
+            }
+            evt.preventDefault();
+            evt.stopPropagation();
+            this.close();
+        })
     }
 
     onClose(): void {
