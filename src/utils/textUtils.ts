@@ -152,7 +152,7 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
 export const MACRO_REGEX = /(\{\{([^\}]+)\}\})/g;
 function extractMacros(text: string): string[] {
     /**
-     * Extract macros 
+     * Extract macros in the format {{macro}}
      * @param text
      * @returns a unique list of macros in the text
      */

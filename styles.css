@@ -44,3 +44,21 @@
     display: table-cell;
     text-align: center;
 }
+
+.sidebar-container {
+    user-select: text;
+}
+
+.sidebar-button {
+    transform: scale(0.6, 0.6);
+}
+
+.sidebar-table-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+.sidebar-table-row {
+    table-layout: auto;
+}

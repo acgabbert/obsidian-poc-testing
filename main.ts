@@ -1,7 +1,18 @@
-import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile } from 'obsidian';
+import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
-import { CodeListModal, addButtonContainer, addButtonToContainer, appendToEnd, createFolderIfNotExists, createNote, defangDomain, parseCodeBlocks, todayFolderStructure } from 'src/utils';
+import {
+	CodeListModal,
+	addButtonContainer,
+	addButtonToContainer,
+	createFolderIfNotExists,
+	createNote,
+	defangDomain,
+	parseCodeBlocks,
+	PluginSidebar,
+	todayFolderStructure,
+	VIEW_TYPE
+} from 'src/utils';
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
@@ -10,6 +21,12 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		console.log('loaded');
 		await this.loadSettings();
+		const searchSites = new Map<string, string>();
+		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
+		this.registerView(VIEW_TYPE, (leaf) => new PluginSidebar(leaf, searchSites));
+		this.addRibbonIcon("cat", "Activate view", () => {
+			this.activateView();
+		});
 
 		const vault = this.app.vault;
 		// dummy fetch data
@@ -121,6 +138,20 @@ export default class MyPlugin extends Plugin {
 				})
 			})
 		})
+	}
+
+	async activateView() {
+		const {workspace} = this.app;
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE);
+		if (leaves.length > 0) {
+			leaf = leaves[0];
+		} else {
+			leaf = workspace.getRightLeaf(false);
+			await leaf?.setViewState({type: VIEW_TYPE});
+		}
+		if (!leaf) return;
+		workspace.revealLeaf(leaf);
 	}
 
 	onunload() {
