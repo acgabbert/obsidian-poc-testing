@@ -4,6 +4,15 @@ import { removeElements } from "./domUtils";
 
 export const VIEW_TYPE = "plugin-sidebar";
 
+export const VT_SEARCH = 'https://virustotal.com/gui/search/%s';
+export const IPDB_SEARCH = 'https://abuseipdb.com/check/%s';
+export const GOOGLE_SEARCH = 'https://google.com/search?q=%s';
+
+export const defaultSearchSites = new Map<string, string>();
+defaultSearchSites.set('VT', VT_SEARCH);
+defaultSearchSites.set('AbuseIPDB', IPDB_SEARCH);
+defaultSearchSites.set('Google', GOOGLE_SEARCH);
+
 export class PluginSidebar extends ItemView {
     ips: string[];
     domains: string[];
@@ -11,6 +20,7 @@ export class PluginSidebar extends ItemView {
     ipEl: HTMLDivElement;
     domainEl: HTMLDivElement;
     hashEl: HTMLDivElement;
+    searchSites: Map<string, string>;
 
     private sidebarContainerClass = "sidebar-container tree-item";
     private listClass = "sidebar-list-item";
@@ -19,10 +29,12 @@ export class PluginSidebar extends ItemView {
     private tableClass = "sidebar-table-row";
     private tdClass = "sidebar-table-item";
 
-    constructor(leaf: WorkspaceLeaf) {
+    constructor(leaf: WorkspaceLeaf, searchSites?: Map<string, string>) {
         super(leaf);
         this.registerActiveFileListener();
         this.registerOpenFile();
+        this.searchSites = defaultSearchSites;
+        if (searchSites) this.searchSites = searchSites;
     }
 
     getViewType(): string {
@@ -70,20 +82,23 @@ export class PluginSidebar extends ItemView {
         );
     }
 
+    addButton(parentEl: HTMLElement, text: string, link: string) {
+        new ButtonComponent(parentEl)
+            .setButtonText(text)
+            .setClass('sidebar-button')
+            .onClick(() => {
+                open(link)
+            })
+    }
+
     addIndicatorEl(parentEl: HTMLElement, indicator: string): void {
         if (!indicator) return;
         const el = parentEl.createDiv({cls: this.listItemClass});
         el.createDiv({cls: "tree-item-inner", text: indicator});
         const buttonEl = parentEl.createDiv({cls: this.tableContainerClass}).createEl("table").createEl("tr", {cls: this.tableClass});
-        new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
-            .setButtonText('VT')
-            .setClass('sidebar-button');
-        new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
-            .setButtonText('IPDB')
-            .setClass('sidebar-button');
-        new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
-            .setButtonText('Google')
-            .setClass('sidebar-button');
+        this.searchSites.forEach((value, key) => {
+            this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), key, value.replace('%s', indicator));
+        });
         return;
     }
 
