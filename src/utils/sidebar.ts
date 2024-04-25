@@ -1,4 +1,4 @@
-import { App, ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
+import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
 import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches } from "./textUtils";
 
 export const VIEW_TYPE = "plugin-sidebar";
@@ -58,10 +58,10 @@ export class PluginSidebar extends ItemView {
 
     addIndicatorEl(parentEl: HTMLElement, indicator: string): void {
         if (!indicator) return;
-        const el = parentEl.createDiv({cls: this.listItemClass}).createEl("tr", {cls: this.tableClass});
-        el.createEl("td", {cls: this.tdClass, text: indicator});
-        const buttonEl = el.createEl("tr", {cls: this.tableClass});
-        new ButtonComponent(buttonEl)
+        const el = parentEl.createDiv({cls: this.listItemClass});
+        el.createDiv({cls: "tree-item-inner", text: indicator});
+        const buttonEl = parentEl.createDiv({cls: "table-container"}).createEl("table").createEl("tr", {cls: this.tableClass});
+        new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
             .setButtonText('VT')
             .setClass('sidebar-button');
         new ButtonComponent(buttonEl.createEl("td", {cls: this.tdClass}))
