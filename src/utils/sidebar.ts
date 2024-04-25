@@ -119,11 +119,15 @@ export class PluginSidebar extends ItemView {
         return;
     }
 
-    async updateView(file: TFile) {
+    async getMatches(file: TFile) {
         const fileContent = await this.app.vault.cachedRead(file);
         this.ips = extractMatches(fileContent, this.ipRegex);
         this.domains = extractMatches(fileContent, this.domainRegex);
         this.hashes = extractMatches(fileContent, this.hashRegex);
+    }
+
+    async updateView(file: TFile) {
+        await this.getMatches(file);
         const container = this.containerEl.children[1];
         this.clearSidebar(container);
         
