@@ -1,4 +1,4 @@
-import { App, Notice, TFile } from "obsidian";
+import { App, Notice, TFile, request } from "obsidian";
 import { OldInputModal } from "./modal";
 export {
     addUniqueValuesToArray,
@@ -9,6 +9,7 @@ export {
     extractMatches,
     findFirstByRegex,
     friendlyDatetime,
+    getValidTld,
     lowerSha256,
     lowerMd5,
     parameterizeCodeBlock,
@@ -24,6 +25,14 @@ export const IP_REGEX = /(\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3})/
 export const DOMAIN_REGEX = /((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.|\[\.\]))+[a-zA-Z][a-zA-Z0-9-]{0,61}[a-zA-Z](?=\.?)\b)/gi;
 export const HASH_REGEX = /(?:^|[^a-fA-F0-9]*)([a-fA-F0-9]{64}|[a-fA-F0-9]{40}|[a-fA-F0-9]{32})/gi;
 export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/]+[\\\/]([^\\\/\n"|]+[\\\/]?)+(\.\w+)?)/gi;
+
+export const TLD_URL = 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt';
+
+async function getValidTld(): Promise<string[] | null> {
+    const resp = await request(TLD_URL);
+    console.log(resp);
+    return null;
+}
 
 function todayLocalDate(): string {
     /**

@@ -1,4 +1,4 @@
-import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
+import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf, request, RequestUrlParam } from 'obsidian';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
 import {
@@ -31,13 +31,15 @@ export default class MyPlugin extends Plugin {
 
 		const vault = this.app.vault;
 		// dummy fetch data
-		const response = await fetch('https://api.github.com/users/github');
-		const data = await response.json();
-		console.log(data);
+		const vtParams = {url:'https://www.virustotal.com/api/v3/ip_addresses/4.79.145.87', headers: {"x-apikey": this.settings.vtApiKey}, throw: true} as RequestUrlParam;
+		try {
+			const data = await request(vtParams);
+			console.log(data);
+		} catch { }
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			new Notice(data['bio']);
+			//new Notice(data['bio']);
 			const folderArray = todayFolderStructure(true);
 			for (let i = 1; i <= folderArray.length; i++) {
 				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
@@ -117,14 +119,6 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new MySettingTab(this.app, this));
-
-		this.addCommand({
-			id: "test",
-			name: "test",
-			editorCallback: (editor: Editor) => {
-				editor.replaceSelection(data['bio']);
-			},
-		});
 		this.transformRef = this.app.workspace.on("editor-menu", (menu) => {
 			menu.addItem((item) => {
 				item.setTitle('Transform Text')

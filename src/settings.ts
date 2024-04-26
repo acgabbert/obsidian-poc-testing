@@ -10,12 +10,16 @@ interface MyPluginSettings {
 	rootFolder: string;
 	rootFolderDropdown: string;
     codeFile: string;
+	vtApiKey: string;
+	ipdbApiKey: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	rootFolder: '',
 	rootFolderDropdown: '',
-    codeFile: ''
+    codeFile: '',
+	vtApiKey: '',
+	ipdbApiKey: ''
 }
 
 class MySettingTab extends PluginSettingTab {
@@ -61,5 +65,23 @@ class MySettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 })
             })
+		new Setting(containerEl)
+			.setName('VirusTotal API Key')
+			.addText((text) => {
+				text.setValue(this.plugin.settings.vtApiKey);
+				text.onChange(async (value) => {
+					this.plugin.settings.vtApiKey = value;
+					await this.plugin.saveSettings();
+				})
+			})
+		new Setting(containerEl)
+			.setName('AbuseIPDB API Key')
+			.addText((text) => {
+				text.setValue(this.plugin.settings.ipdbApiKey);
+				text.onChange(async (value) => {
+					this.plugin.settings.ipdbApiKey = value;
+					await this.plugin.saveSettings();
+				})
+			})
 	}
 }
