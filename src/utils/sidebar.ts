@@ -64,6 +64,8 @@ export class PluginSidebar extends ItemView {
         let containers = document.getElementsByClassName(this.sidebarContainerClass);
         console.log(`tryign to open ${containers.length} els`);
         openDetails(containers as HTMLCollectionOf<HTMLDetailsElement>);
+        const file = this.app.workspace.getActiveFile();
+        if (file) await this.updateView(file);
     }
 
     addContainer(el: Element, text: string) {
