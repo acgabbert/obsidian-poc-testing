@@ -1,6 +1,6 @@
 import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
 import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches } from "./textUtils";
-import { removeElements } from "./domUtils";
+import { openDetails, removeElements } from "./domUtils";
 
 export const VIEW_TYPE = "plugin-sidebar";
 
@@ -58,15 +58,34 @@ export class PluginSidebar extends ItemView {
         const container = this.containerEl.children[1];
         container.empty();
         container.createEl("h4", {text: this.sidebarTitle});
-        const ipContainer = container.createDiv({cls: this.sidebarContainerClass});
-        ipContainer.createEl("h4", {cls: "tree-item-self is-clickable mod-collapsible", text: "IPs"});
-        this.ipEl = ipContainer.createDiv({cls: "tree-item-children"});
-        const domainContainer = container.createDiv({cls: this.sidebarContainerClass});
-        domainContainer.createEl("h4", {cls: "tree-item-self is-clickable mod-collapsible", text: "Domains"})
-        this.domainEl = domainContainer.createDiv({cls: "tree-item-children"});
-        const hashContainer = container.createDiv({cls: this.sidebarContainerClass});
-        hashContainer.createEl("h4", {cls: "tree-item-self is-clickable mod-collapsible", text: "Hashes"});
-        this.hashEl = hashContainer.createDiv({cls: "tree-item-children"});
+        this.ipEl = this.addContainer(container, "IPs");
+        this.domainEl = this.addContainer(container, "Domains");
+        this.hashEl = this.addContainer(container, "Hashes");
+        let containers = document.getElementsByClassName(this.sidebarContainerClass);
+        console.log(`tryign to open ${containers.length} els`);
+        openDetails(containers as HTMLCollectionOf<HTMLDetailsElement>);
+    }
+
+    addContainer(el: Element, text: string) {
+        const container = el.createEl("details", {cls: this.sidebarContainerClass});
+        /*
+        const collapsible = container.createDiv({cls: "tree-item-self is-clickable mod-collapsible"});
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttr("width", "24");
+        svg.setAttr("height", "24");
+        svg.setAttr("viewBox", "0 0 24 24");
+        svg.setAttr("fill", "none");
+        svg.setAttr("fill", "none");
+        svg.setAttr("stroke", "currentColor");
+        svg.setAttr("stroke-width", "2");
+        svg.setAttr("stroke-linecap", "round");
+        svg.setAttr("stroke-linejoin", "round");
+        svg.setAttr("class", "svg-icon right-triangle");
+        svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path")).setAttr("d", "M3 8L12 17L21 8");
+        collapsible.createDiv({cls: "tree-item-icon collapse-icon"}).appendChild(svg);
+        */
+        container.createEl("summary", {cls: "tree-item-inner", text: text});
+        return container.createDiv({cls: "tree-item-children"});
     }
 
     registerActiveFileListener() {
