@@ -1,4 +1,4 @@
-import { App, Notice, TFile, request } from "obsidian";
+import { App, Notice, RequestUrlParam, TFile, request } from "obsidian";
 import { OldInputModal } from "./modal";
 export {
     addUniqueValuesToArray,
@@ -29,9 +29,17 @@ export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/]+[\\\/]([^\\\/\n"|]+[
 export const TLD_URL = 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt';
 
 async function getValidTld(): Promise<string[] | null> {
-    const resp = await request(TLD_URL);
-    console.log(resp);
-    return null;
+    const tldParams = {url: 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt', throw: true} as RequestUrlParam;
+    try {
+        const data = await request(tldParams);
+        const tlds = data.split('\n');
+        if (tlds[0].startsWith('#')) tlds.shift();
+        console.log(tlds);
+        return tlds;
+    } catch {
+        console.log('failed');
+        return null;
+    }
 }
 
 function todayLocalDate(): string {

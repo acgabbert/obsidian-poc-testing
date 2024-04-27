@@ -11,7 +11,8 @@ import {
 	parseCodeBlocks,
 	PluginSidebar,
 	todayFolderStructure,
-	VIEW_TYPE
+	VIEW_TYPE,
+	getValidTld
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
@@ -36,6 +37,9 @@ export default class MyPlugin extends Plugin {
 			const data = await request(vtParams);
 			console.log(data);
 		} catch { }
+		let tlds = await getValidTld();
+		if (tlds) this.settings.validTld = tlds;
+		await this.saveSettings();
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.

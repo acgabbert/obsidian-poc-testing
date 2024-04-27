@@ -12,6 +12,7 @@ interface MyPluginSettings {
     codeFile: string;
 	vtApiKey: string;
 	ipdbApiKey: string;
+	validTld: string[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -19,7 +20,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	rootFolderDropdown: '',
     codeFile: '',
 	vtApiKey: '',
-	ipdbApiKey: ''
+	ipdbApiKey: '',
+	validTld: new Array()
 }
 
 class MySettingTab extends PluginSettingTab {
