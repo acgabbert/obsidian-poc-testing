@@ -26,7 +26,7 @@ export default class MyPlugin extends Plugin {
 		const searchSites = new Map<string, string>();
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
-		this.registerView(VIEW_TYPE, (leaf) => new PluginSidebar(leaf));
+		this.registerView(VIEW_TYPE, (leaf) => new PluginSidebar(leaf, undefined, this.settings.validTld));
 		this.addRibbonIcon("cat", "Activate view", () => {
 			this.activateView();
 		});

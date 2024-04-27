@@ -1,5 +1,5 @@
 import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
-import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches } from "./textUtils";
+import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches, validateDomain } from "./textUtils";
 import { openDetails, removeElements } from "./domUtils";
 
 export const VIEW_TYPE = "plugin-sidebar";
@@ -22,6 +22,7 @@ export class PluginSidebar extends ItemView {
     hashEl: HTMLDivElement;
     searchSites: Map<string, string>;
     sidebarTitle: string;
+    validTld: string[];
 
     ipRegex: RegExp;
     hashRegex: RegExp;
@@ -34,7 +35,7 @@ export class PluginSidebar extends ItemView {
     private tableClass = "sidebar-table-row";
     private tdClass = "sidebar-table-item";
 
-    constructor(leaf: WorkspaceLeaf, searchSites?: Map<string, string>) {
+    constructor(leaf: WorkspaceLeaf, searchSites?: Map<string, string>, validTld?: string[]) {
         super(leaf);
         this.registerActiveFileListener();
         this.registerOpenFile();
@@ -43,6 +44,7 @@ export class PluginSidebar extends ItemView {
         this.ipRegex = IP_REGEX;
         this.hashRegex = HASH_REGEX;
         this.domainRegex = DOMAIN_REGEX;
+        if (validTld) this.validTld = validTld;
         if (searchSites) this.searchSites = searchSites;
     }
 
@@ -144,6 +146,12 @@ export class PluginSidebar extends ItemView {
         const fileContent = await this.app.vault.cachedRead(file);
         this.ips = extractMatches(fileContent, this.ipRegex);
         this.domains = extractMatches(fileContent, this.domainRegex);
+        this.domains.forEach((domain, index, object) => {
+            if (!validateDomain(domain, this.validTld)) {
+                console.log(`${domain} doesn't match`)
+                object.splice(index, 1);
+            }
+        })
         this.hashes = extractMatches(fileContent, this.hashRegex);
     }
 

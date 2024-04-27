@@ -17,7 +17,8 @@ export {
     replaceMacros,
     replaceTemplateText,
     todayLocalDate,
-    todayFolderStructure
+    todayFolderStructure,
+    validateDomain
 }
 
 // regex for possibly defanged values
@@ -187,12 +188,10 @@ function extractMatches(text: string, pattern: RegExp | RegExp[]): string[] {
     if (Array.isArray(pattern)) {
         const matches = new Array();
         pattern.forEach((value) => {
-            console.log(`checking matches for ${value}`);
             addUniqueValuesToArray(matches, text.matchAll(value));
         });
         return matches;
     } else {
-        console.log(`checking matches for ${pattern}`);
         const matches = text.matchAll(pattern);
         return addUniqueValuesToArray([], matches);
     }
@@ -289,4 +288,11 @@ function constructMacroRegex(macroRegex: string | RegExp): RegExp {
     if (macroRegex instanceof RegExp) macroRegex = macroRegex.source;
     const retval = new RegExp(macroRegex + macroSeparator + macroValue, "gi");
     return retval;
+}
+
+function validateDomain(domain: string, validTld: string[]): boolean {
+    const tld = domain.split('.').pop()?.toUpperCase();
+    console.log(`validating tld ${tld}`);
+    if (tld && validTld.includes(tld)) return true;
+    return false;
 }
