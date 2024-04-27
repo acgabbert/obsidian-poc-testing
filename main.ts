@@ -12,7 +12,8 @@ import {
 	PluginSidebar,
 	todayFolderStructure,
 	VIEW_TYPE,
-	getValidTld
+	getValidTld,
+	vtDomain
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
@@ -31,12 +32,12 @@ export default class MyPlugin extends Plugin {
 		});
 
 		const vault = this.app.vault;
-		// dummy fetch data
-		const vtParams = {url:'https://www.virustotal.com/api/v3/ip_addresses/4.79.145.87', headers: {"x-apikey": this.settings.vtApiKey}, throw: true} as RequestUrlParam;
 		try {
-			const data = await request(vtParams);
+			const data = await vtDomain('facebook.com', this.settings.vtApiKey);
 			console.log(data);
-		} catch { }
+		} catch(e) {
+			console.log(e);
+		}
 		let tlds = await getValidTld();
 		if (tlds) this.settings.validTld = tlds;
 		await this.saveSettings();
