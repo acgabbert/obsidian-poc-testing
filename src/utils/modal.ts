@@ -15,7 +15,6 @@ class CodeListModal extends SuggestModal<string> {
     macros: Map<RegExp, RegExp[]>;
 
     constructor(app: App, content: Map<string, string>, macros?: Map<RegExp, RegExp[]>) {
-        console.log('constructing modal')
         super(app);
         this.content = content;
         this.macros = supportedMacros;
@@ -43,7 +42,6 @@ class CodeListModal extends SuggestModal<string> {
     onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
         let result = this.content.get(item)!;
         const extractedMacros = extractMacros(result);
-        console.log(extractedMacros);
         if (extractedMacros.length > 0) {
             // can pass on:
             // - the selected script
@@ -137,7 +135,6 @@ class InputModal extends Modal {
 
     onClose(): void {
         const {contentEl} = this;
-        console.log(this.replacements);
         contentEl.empty();
         this.replacements.forEach((value, key) => {
             this.content = this.content.replaceAll(key, value);

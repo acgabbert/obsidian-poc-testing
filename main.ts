@@ -21,10 +21,8 @@ export default class MyPlugin extends Plugin {
 	private transformRef: EventRef;
 
 	async onload() {
-		console.log('loaded');
 		await this.loadSettings();
 		const searchSites = new Map<string, string>();
-		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
 		this.registerView(VIEW_TYPE, (leaf) => new PluginSidebar(leaf, undefined, this.settings.validTld));
 		this.addRibbonIcon("cat", "Activate view", () => {
@@ -47,7 +45,6 @@ export default class MyPlugin extends Plugin {
 			//new Notice(data['bio']);
 			const folderArray = todayFolderStructure(true);
 			for (let i = 1; i <= folderArray.length; i++) {
-				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
 			}
 		});
@@ -56,7 +53,6 @@ export default class MyPlugin extends Plugin {
 			// Called when the user clicks the icon.
 			const folderArray = todayFolderStructure(true);
 			for (let i = 1; i <= folderArray.length; i++) {
-				console.log(`trying to create ${folderArray.slice(0,i).join('/')}`);
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
 			}
 			console.log(`creating /${this.settings.rootFolder}/${folderArray.join('/')}`)
@@ -65,10 +61,8 @@ export default class MyPlugin extends Plugin {
 		const codeIcon = this.addRibbonIcon('shell', 'Copy code', async (evt: MouseEvent) => {
 			const codeFile = this.app.vault.getFileByPath(this.settings.codeFile);
 			if (!codeFile) return;
-			console.log(codeFile)
 			const code = parseCodeBlocks(await this.app.vault.read(codeFile))
 			if (!code) return;
-			console.log(code);
 			new CodeListModal(this.app, code).open();
 		});
 		// Perform additional things with the ribbon
@@ -82,7 +76,6 @@ export default class MyPlugin extends Plugin {
 			id: 'sample-editor-command',
 			name: 'Sample editor command',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
 				editor.replaceSelection('Sample Editor Command');
 			},
 		});
@@ -131,7 +124,6 @@ export default class MyPlugin extends Plugin {
 					const editor = this.app.workspace.activeEditor?.editor;
 					if (editor) {
 						const selection = editor.getSelection();
-						console.log(`got ${selection}`);
 						let replaced = defangDomain(selection);
 						editor.replaceSelection(replaced);
 					}

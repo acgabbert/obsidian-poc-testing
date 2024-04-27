@@ -25,27 +25,22 @@ export const VT_DOMAIN: ApiVals = {
 
 async function vtCall(url: string, key: string): Promise<JSON> {
     const headers = {"x-apikey": key};
-    console.log(headers);
     const vtParams = {url: url, headers: headers, throw: true} as RequestUrlParam;
-    console.log(key);
     const data = await request(vtParams);
     return JSON.parse(data).data.attributes;
 }
 
 async function vtDomain(val: string, key: string): Promise<JSON> {
     const url = VT_DOMAIN.baseUrl + val;
-    console.log(url);
     return await vtCall(url, key);
 }
 
 async function vtHash(val: string, key: string): Promise<JSON> {
     const url = VT_HASH.baseUrl + val;
-    console.log(url);
     return await vtCall(url, key);
 }
 
 async function vtIp(val: string, key: string): Promise<JSON> {
     const url = VT_IP.baseUrl + val;
-    console.log(url);
     return await vtCall(url, key);
 }

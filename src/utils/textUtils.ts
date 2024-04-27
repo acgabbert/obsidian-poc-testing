@@ -35,7 +35,6 @@ async function getValidTld(): Promise<string[] | null> {
         const data = await request(tldParams);
         const tlds = data.split('\n');
         if (tlds[0].startsWith('#')) tlds.shift();
-        console.log(tlds);
         return tlds;
     } catch {
         console.log('failed');
@@ -292,7 +291,6 @@ function constructMacroRegex(macroRegex: string | RegExp): RegExp {
 
 function validateDomain(domain: string, validTld: string[]): boolean {
     const tld = domain.split('.').pop()?.toUpperCase();
-    console.log(`validating tld ${tld}`);
     if (tld && validTld.includes(tld)) return true;
     return false;
 }
