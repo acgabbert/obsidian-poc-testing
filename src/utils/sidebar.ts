@@ -146,12 +146,14 @@ export class PluginSidebar extends ItemView {
         const fileContent = await this.app.vault.cachedRead(file);
         this.ips = extractMatches(fileContent, this.ipRegex);
         this.domains = extractMatches(fileContent, this.domainRegex);
-        this.domains.forEach((domain, index, object) => {
-            if (!validateDomain(domain, this.validTld)) {
-                console.log(`${domain} doesn't match`)
-                object.splice(index, 1);
-            }
-        })
+        if (this.validTld) {
+            this.domains.forEach((domain, index, object) => {
+                if (!validateDomain(domain, this.validTld)) {
+                    console.log(`${domain} doesn't match`)
+                    object.splice(index, 1);
+                }
+            });
+        }
         this.hashes = extractMatches(fileContent, this.hashRegex);
     }
 
