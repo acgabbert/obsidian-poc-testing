@@ -13,7 +13,8 @@ import {
 	todayFolderStructure,
 	VIEW_TYPE,
 	getValidTld,
-	vtDomain
+	virusTotal,
+	VT_DOMAIN
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
@@ -31,7 +32,7 @@ export default class MyPlugin extends Plugin {
 
 		const vault = this.app.vault;
 		try {
-			const data = await vtDomain('facebook.com', this.settings.vtApiKey);
+			const data = await virusTotal(VT_DOMAIN, 'facebook.com', this.settings.vtApiKey);
 			console.log(data);
 		} catch(e) {
 			console.log(e);
