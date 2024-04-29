@@ -24,6 +24,12 @@ export const VT_DOMAIN: ApiVals = {
     iocType: "domain"
 }
 
+export const VT_SEARCH: ApiVals = {
+    baseUrl: "https://www.virustotal.com/api/v3/search/",
+    iocType: ["ip", "hash", "domain"],
+    queryString: {"query": ""}
+}
+
 async function virusTotal(vals: ApiVals, val: string, key: string): Promise<JSON> {
     const headers = {'x-apikey': key};
     const vtParams = {url: vals.baseUrl + val, headers: headers, throw: true} as RequestUrlParam;
@@ -46,7 +52,17 @@ interface VtAttributes {
 }
 
 export interface VtFileAttributes extends VtAttributes {
+    crowdsourced_yara_results: YaraResult[]
+    last_analysis_results: Record<string, AnalysisResult>
+    md5: string
+    names: string[]
     packers: Record<string, string>
+    sha1: string
+    sha256: string
+    size: number
+    tags: string[]
+    type_tag: string
+    type_tags: string[]
 }
 
 export interface VtDomainAttributes extends VtAttributes {
@@ -82,4 +98,22 @@ type VtAnalysisResult = {
 type VtDomainPopularity = {
     timestamp: number
     rank: number
+}
+
+type YaraResult = {
+    ruleset_id: string
+    rule_name: string
+    ruleset_name: string
+    description: string
+    author: string
+    source: string
+}
+
+type AnalysisResult = {
+    method: string
+    engine_name: string
+    engine_version: string
+    engine_update: string
+    category: string
+    result: string | null
 }
