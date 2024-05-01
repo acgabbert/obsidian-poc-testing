@@ -52,6 +52,11 @@
     transform: scale(0.8, 0.8);
 }
 
+.code__language {
+    float: right;
+    font-size: x-small;
+}
+
 /*
 .sidebar-table-item {
     overflow: hidden;

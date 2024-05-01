@@ -1,5 +1,5 @@
 import { App, Notice, RequestUrlParam, TFile, request } from "obsidian";
-import { OldInputModal } from "./modal";
+import { Code, OldInputModal } from "./modal";
 export {
     addUniqueValuesToArray,
     constructMacroRegex,
@@ -264,18 +264,23 @@ function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExp
     return array;
 }
 
-function parseCodeBlocks(content: string): Map<string, string> {
+function parseCodeBlocks(content: string): Map<string, Code> {
     /**
      * Parse code blocks and the headers before them
      * @param content file content
      * @returns a mapping of headers to code blcok content
      */
     const retval = new Map();
-    const codeBlockRegex = /#+\s+(.+)$\n+```\w*\n(((?!^```\n).|\n)*)\n^```$/gm;
-    const matchArray = [...content.matchAll(codeBlockRegex)];
+    const codeBlockRegex = /#+\s+(.+)$\n+```(\w*)\n(((?!^```\n).|\n)*)\n^```$/gm;
+    const matches = content.matchAll(codeBlockRegex);
+    const matchArray = [...matches];
     matchArray.forEach((match) => {
         if (!retval.has(match[1])) {
-            retval.set(match[1], match[2]);
+            const code: Code = {
+                content: match[3],
+                lang: match[2]
+            };
+            retval.set(match[1], code);
         }
     });
     return retval;

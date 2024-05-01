@@ -14,7 +14,8 @@ import {
 	VIEW_TYPE,
 	getValidTld,
 	virusTotal,
-	VT_DOMAIN
+	VT_DOMAIN,
+	removeElements
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
@@ -98,11 +99,7 @@ export default class MyPlugin extends Plugin {
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView)?.containerEl;
 			if (!view) return;
 			const els = view.getElementsByClassName(className);
-			if (els && els.length > 0) {
-				Array.from(els).forEach((element: HTMLObjectElement) => {
-					view.removeChild(element);
-				})
-			}
+			removeElements(els);
 			const container = addButtonContainer(this.app.workspace, file, className);
 			if (!container) return;
 			const button = addButtonToContainer(container, 'Button!').onClick(() => {

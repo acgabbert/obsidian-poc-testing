@@ -10,11 +10,17 @@ supportedMacros.set(/(host|computer|comp)(name)?/gi, new Array(constructMacroReg
 supportedMacros.set(/(hash|sha256|sha)/gi, new Array(constructMacroRegex(/(?:hash|sha\s*256|sha)/))); // hash
 supportedMacros.set(/(file(path)?|path)(name)?/gi, new Array(FILE_REGEX, constructMacroRegex(/(?:(?:file\s*(?:path)?|path)\s*(?:name)?)/))); // file
 
+export interface Code {
+    content: string,
+    lang: string,
+    icon?: string
+}
+
 class CodeListModal extends SuggestModal<string> {
-    content: Map<string, string>;
+    content: Map<string, Code>;
     macros: Map<RegExp, RegExp[]>;
 
-    constructor(app: App, content: Map<string, string>, macros?: Map<RegExp, RegExp[]>) {
+    constructor(app: App, content: Map<string, Code>, macros?: Map<RegExp, RegExp[]>) {
         super(app);
         this.content = content;
         this.macros = supportedMacros;
@@ -24,23 +30,27 @@ class CodeListModal extends SuggestModal<string> {
     getSuggestions(query: string): string[] | Promise<string[]> {
         const keys = [...this.content.keys()];
         return keys.filter((item) =>
-            item.toLowerCase().includes(query.toLowerCase()) || this.content.get(item)?.toLowerCase().includes(query.toLowerCase())
+            item.toLowerCase().includes(query.toLowerCase())
+            || this.content.get(item)?.content.toLowerCase().includes(query.toLowerCase())
+            || this.content.get(item)?.lang.toLowerCase().includes(query.toLowerCase())
         );
     }
 
     renderSuggestion(value: string, el: HTMLElement) {
         const lineRegex = /([^\n]*\n?){0,4}/g;
-        const item = this.content.get(value);
-        const clippedItem = lineRegex.exec(item!)![0];
-        el.createEl("div", {text: value});
+        const item = this.content.get(value)!;
+        const clippedItem = lineRegex.exec(item.content)![0];
+        //el.createEl("span") icon
+        el.createEl("span", {text: value});
+        el.createEl("span", {text: item.lang, cls: "code__language"});
         el.createEl("div", {text: clippedItem, cls: "code__suggestion"});
-        if (item !== clippedItem) {
+        if (item.content !== clippedItem) {
             el.createEl("div", {text: '...', cls: "code__suggestion_bottom"});
         }
     }
     
     onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
-        let result = this.content.get(item)!;
+        let result = this.content.get(item)!.content;
         const extractedMacros = extractMacros(result);
         if (extractedMacros.length > 0) {
             // can pass on:
