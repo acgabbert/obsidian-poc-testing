@@ -2,7 +2,7 @@ import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
 import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, MACRO_REGEX, replaceMacros } from "./textUtils";
 import { getActiveNoteContent } from "./workspaceUtils";
 
-export { CodeListModal, CodeModal, ErrorModal, InputModal, OldInputModal };
+export { CodeListModal, CodeModal, ErrorModal, InputModal };
 
 export const supportedMacros = new Map<RegExp, RegExp[]>();
 supportedMacros.set(/user(name)?/gi, new Array(constructMacroRegex(/user(?:\s*named?)?/))); // username
@@ -41,7 +41,7 @@ class CodeListModal extends SuggestModal<string> {
         const item = this.content.get(value)!;
         const clippedItem = lineRegex.exec(item.content)![0];
         //el.createEl("span") icon
-        el.createEl("span", {text: value});
+        el.createEl("span", {text: value, cls: "code__suggestion_title"});
         el.createEl("span", {text: item.lang, cls: "code__language"});
         el.createEl("div", {text: clippedItem, cls: "code__suggestion"});
         if (item.content !== clippedItem) {
@@ -150,48 +150,6 @@ class InputModal extends Modal {
             this.content = this.content.replaceAll(key, value);
         })
         new CodeModal(this.app, this.content).open();
-    }
-}
-
-class OldInputModal extends Modal {
-    input: Map<string, string>;
-    params: string[];
-    onSubmit: (input: Map<string, string>) => void;
-
-    constructor(app: App, matches: string[], onSubmit: (result: Map<string, string>) => void) {
-        super(app);
-        this.params = matches;
-        this.input = new Map();
-        this.onSubmit = onSubmit;
-    }
-
-    onOpen(): void {
-        const {contentEl} = this;
-        contentEl.createEl("h1", {text: "Input Parameters:"});
-        
-        this.params.forEach((param) => {
-            new Setting(contentEl)
-                .setName(param)
-                .addText((text) =>
-                    text.onChange((input) => {
-                        this.input.set(param, input);
-                    }));
-        });
-
-        new Setting(contentEl)
-            .addButton((btn) =>
-                btn
-                    .setButtonText("Submit")
-                    .setCta()
-                    .onClick(() => {
-                        this.close();
-                        this.onSubmit(this.input);
-                    }));
-    }
-
-    onClose(): void {
-        const {contentEl} = this;
-        contentEl.empty();
     }
 }
 

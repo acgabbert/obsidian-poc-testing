@@ -1,5 +1,5 @@
-import { App, Notice, RequestUrlParam, TFile, request } from "obsidian";
-import { Code, OldInputModal } from "./modal";
+import { App, RequestUrlParam, TFile, request } from "obsidian";
+import { Code, InputModal } from "./modal";
 export {
     addUniqueValuesToArray,
     constructMacroRegex,
@@ -226,21 +226,9 @@ async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string>
     if (target.parentElement?.firstChild && target['className'] === 'copy-code-button') {
         const child = <HTMLElement>target.parentElement.firstChild;
         text = <string>child.innerText;
-        let matchArray = extractMacros(text);
-        let userInput = new Map<string, string>();
-        if (matchArray.length > 0) {
-            new OldInputModal(app, matchArray, (input) => {
-                input.forEach(async (value, key) => {
-                    userInput.set(`${key}`, value);
-                });
-            }).open();
-            await new Promise(resolve => {
-                const loop = (): void | any => userInput.size === matchArray.length ? resolve(userInput) : setTimeout(loop)
-                loop();
-            });
-            text = replaceMacros(text, userInput);
-            await navigator.clipboard.writeText(text);
-            new Notice('Copied parameterized content to clipboard!')
+        let macroArray = extractMacros(text);
+        if (macroArray.length > 0) {
+            new InputModal(app, text, macroArray);
         } else {
             console.log('No parameter matches');
         }
