@@ -29,6 +29,6 @@ function appendToEnd(app: App, file: TFile, text: string) {
     if (!lastLineLen) return;
     const lastLinePos = {line: lastLine, ch: lastLineLen} as EditorPosition;
     editor.setCursor(lastLinePos);
-    editor.scrollIntoView({from: LastLinePos, to: LastLinePos}, true);
+    editor.scrollIntoView({from: lastLinePos, to: lastLinePos}, true);
     editor.focus();
 }
