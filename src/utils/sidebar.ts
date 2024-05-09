@@ -166,19 +166,23 @@ export class PluginSidebar extends ItemView {
                     if (search.ip) {
                         this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
                     }
+                    break;
                 }
                 case 'domain': {
                     if (search.domain) {
                         this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
                     }
+                    break;
                 }
                 case 'hash': {
                     if (search.hash) {
                         this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
                     }
+                    break;
                 }
                 default: {
                     this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
+                    break;
                 }
             }
         });
@@ -214,13 +218,13 @@ export class PluginSidebar extends ItemView {
         this.clearSidebar(container);
         
         this.ips.forEach((ip) => {
-            this.addIndicatorEl(this.ipEl, ip);
+            this.addIndicatorEl(this.ipEl, ip, 'ip');
         });
         this.domains.forEach((domain) => {
-            this.addIndicatorEl(this.domainEl, domain);
+            this.addIndicatorEl(this.domainEl, domain, 'domain');
         });
         this.hashes.forEach((hash) => {
-            this.addIndicatorEl(this.hashEl, hash);
+            this.addIndicatorEl(this.hashEl, hash, 'hash');
         });
     }
 
