@@ -44,7 +44,7 @@ const googleSearch: searchSite = {
     domain: true
 }
 
-export const defaultSites: searchSite[] = [];
+export const defaultSites: searchSite[] = [vtSearch, ipdbSearch, googleSearch];
 
 export class PluginSidebar extends ItemView {
     ips: string[];
