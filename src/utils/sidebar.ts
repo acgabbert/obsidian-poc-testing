@@ -17,7 +17,7 @@ export interface searchSite {
     domain: boolean
 }
 
-const vtSearch: searchSite = {
+export const vtSearch: searchSite = {
     name: 'VirusTotal',
     shortName: 'VT',
     site: VT_SEARCH,
@@ -26,7 +26,7 @@ const vtSearch: searchSite = {
     domain: true
 }
 
-const ipdbSearch: searchSite = {
+export const ipdbSearch: searchSite = {
     name: 'AbuseIPDB',
     shortName: 'IPDB',
     site: IPDB_SEARCH,
@@ -35,7 +35,7 @@ const ipdbSearch: searchSite = {
     domain: true
 }
 
-const googleSearch: searchSite = {
+export const googleSearch: searchSite = {
     name: 'Google',
     shortName: 'Google',
     site: GOOGLE_SEARCH,
