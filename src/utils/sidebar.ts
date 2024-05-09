@@ -8,10 +8,43 @@ export const VT_SEARCH = 'https://virustotal.com/gui/search/%s';
 export const IPDB_SEARCH = 'https://abuseipdb.com/check/%s';
 export const GOOGLE_SEARCH = 'https://google.com/search?q=%s';
 
-export const defaultSearchSites = new Map<string, string>();
-defaultSearchSites.set('VT', VT_SEARCH);
-defaultSearchSites.set('AbuseIPDB', IPDB_SEARCH);
-defaultSearchSites.set('Google', GOOGLE_SEARCH);
+interface searchSite {
+    name: string
+    shortName: string
+    site: string
+    ip: boolean
+    hash: boolean
+    domain: boolean
+}
+
+const vtSearch: searchSite = {
+    name: 'VirusTotal',
+    shortName: 'VT',
+    site: VT_SEARCH,
+    ip: true,
+    hash: true,
+    domain: true
+}
+
+const ipdbSearch: searchSite = {
+    name: 'AbuseIPDB',
+    shortName: 'IPDB',
+    site: IPDB_SEARCH,
+    ip: true,
+    hash: false,
+    domain: true
+}
+
+const googleSearch: searchSite = {
+    name: 'Google',
+    shortName: 'Google',
+    site: GOOGLE_SEARCH,
+    ip: true,
+    hash: true,
+    domain: true
+}
+
+export const defaultSites: searchSite[] = [];
 
 export class PluginSidebar extends ItemView {
     ips: string[];
@@ -20,7 +53,7 @@ export class PluginSidebar extends ItemView {
     ipEl: HTMLDivElement;
     domainEl: HTMLDivElement;
     hashEl: HTMLDivElement;
-    searchSites: Map<string, string>;
+    searchSites: searchSite[];
     sidebarTitle: string;
     validTld: string[];
 
@@ -35,11 +68,11 @@ export class PluginSidebar extends ItemView {
     private tableClass = "sidebar-table-row";
     private tdClass = "sidebar-table-item";
 
-    constructor(leaf: WorkspaceLeaf, searchSites?: Map<string, string>, validTld?: string[]) {
+    constructor(leaf: WorkspaceLeaf, searchSites?: searchSite[], validTld?: string[]) {
         super(leaf);
         this.registerActiveFileListener();
         this.registerOpenFile();
-        this.searchSites = defaultSearchSites;
+        this.searchSites = defaultSites;
         this.sidebarTitle = 'Extracted Indicators';
         this.ipRegex = IP_REGEX;
         this.hashRegex = HASH_REGEX;
@@ -122,13 +155,32 @@ export class PluginSidebar extends ItemView {
             })
     }
 
-    addIndicatorEl(parentEl: HTMLElement, indicator: string): void {
+    addIndicatorEl(parentEl: HTMLElement, indicator: string, indicatorType?: string): void {
         if (!indicator) return;
         const el = parentEl.createDiv({cls: this.listItemClass});
         el.createDiv({cls: "tree-item-inner", text: indicator});
         const buttonEl = parentEl.createDiv({cls: this.tableContainerClass}).createEl("table").createEl("tr", {cls: this.tableClass});
-        this.searchSites.forEach((value, key) => {
-            this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), key, value.replace('%s', indicator));
+        this.searchSites.forEach((search) => {
+            switch(indicatorType) {
+                case 'ip': {
+                    if (search.ip) {
+                        this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
+                    }
+                }
+                case 'domain': {
+                    if (search.domain) {
+                        this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
+                    }
+                }
+                case 'hash': {
+                    if (search.hash) {
+                        this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
+                    }
+                }
+                default: {
+                    this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
+                }
+            }
         });
         return;
     }
