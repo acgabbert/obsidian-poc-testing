@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, TFile } from "obsidian";
+import { App, Editor, EditorPosition, MarkdownView, TFile } from "obsidian";
 export { appendToEnd, transformSelectedText };
 
 function transformSelectedText(editor: Editor, func: Function) {
@@ -27,7 +27,8 @@ function appendToEnd(app: App, file: TFile, text: string) {
     lastLine = lastLine - 1;
     let lastLineLen = editor.getLine(lastLine).length;
     if (!lastLineLen) return;
-    console.log(`last line: ${lastLine}\n${editor.getLine(lastLine)}\nlength: ${lastLineLen}`);
-    editor.setCursor({line: lastLine, ch: lastLineLen});
+    const lastLinePos = {line: lastLine, ch: lastLineLen} as EditorPosition;
+    editor.setCursor(lastLinePos);
+    editor.scrollIntoView({from: lastLinePos, to: lastLinePos}, true);
     editor.focus();
 }
