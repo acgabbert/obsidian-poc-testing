@@ -34,10 +34,11 @@ async function getValidTld(): Promise<string[] | null> {
     try {
         const data = await request(tldParams);
         const tlds = data.split('\n');
-        if (tlds[0].startsWith('#')) tlds.shift();
+        if (tlds[0].startsWith('#')) tlds.shift(); // first line comment
+        if (!tlds[-1]) tlds.pop(); // last line empty string
         return tlds;
     } catch {
-        console.log('failed');
+        console.log('failed to get valid TLDs');
         return null;
     }
 }
