@@ -35,7 +35,7 @@ async function getValidTld(): Promise<string[] | null> {
         const data = await request(tldParams);
         const tlds = data.split('\n');
         if (tlds[0].startsWith('#')) tlds.shift(); // first line comment
-        if (!tlds[-1]) tlds.pop(); // last line empty string
+        if (!tlds.slice(-1)[0]) tlds.pop(); // last line empty string
         return tlds;
     } catch {
         console.log('failed to get valid TLDs');
