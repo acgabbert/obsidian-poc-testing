@@ -1,5 +1,5 @@
 import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
-import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches, validateDomain } from "./textUtils";
+import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches, refangIoc, removeArrayDuplicates, validateDomain } from "./textUtils";
 import { openDetails, removeElements } from "./domUtils";
 
 export const VIEW_TYPE = "plugin-sidebar";
@@ -104,22 +104,6 @@ export class PluginSidebar extends ItemView {
 
     addContainer(el: Element, text: string) {
         const container = el.createEl("details", {cls: this.sidebarContainerClass});
-        /*
-        const collapsible = container.createDiv({cls: "tree-item-self is-clickable mod-collapsible"});
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttr("width", "24");
-        svg.setAttr("height", "24");
-        svg.setAttr("viewBox", "0 0 24 24");
-        svg.setAttr("fill", "none");
-        svg.setAttr("fill", "none");
-        svg.setAttr("stroke", "currentColor");
-        svg.setAttr("stroke-width", "2");
-        svg.setAttr("stroke-linecap", "round");
-        svg.setAttr("stroke-linejoin", "round");
-        svg.setAttr("class", "svg-icon right-triangle");
-        svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path")).setAttr("d", "M3 8L12 17L21 8");
-        collapsible.createDiv({cls: "tree-item-icon collapse-icon"}).appendChild(svg);
-        */
         container.createEl("summary", {cls: "tree-item-inner", text: text});
         return container.createDiv({cls: "tree-item-children"});
     }
@@ -197,10 +181,18 @@ export class PluginSidebar extends ItemView {
         return;
     }
 
+    refangIocs() {
+        this.ips = this.ips.map((x) => refangIoc(x));
+        this.domains = this.domains.map((x) => refangIoc(x));
+        this.ips = removeArrayDuplicates(this.ips);
+        this.domains = removeArrayDuplicates(this.domains);
+    }
+
     async getMatches(file: TFile) {
         const fileContent = await this.app.vault.cachedRead(file);
         this.ips = extractMatches(fileContent, this.ipRegex);
         this.domains = extractMatches(fileContent, this.domainRegex);
+        this.refangIocs();
         if (this.validTld) {
             this.domains.forEach((domain, index, object) => {
                 if (!validateDomain(domain, this.validTld)) {

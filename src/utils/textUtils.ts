@@ -14,6 +14,8 @@ export {
     lowerMd5,
     parameterizeCodeBlock,
     parseCodeBlocks,
+    refangIoc,
+    removeArrayDuplicates,
     replaceMacros,
     replaceTemplateText,
     todayLocalDate,
@@ -98,6 +100,18 @@ function defangDomain(text: string): string {
     const anyDomain = /(([a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.?)+)\.((xn--)?([a-z][a-z0-9\-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/g;
     let retval = text.replaceAll(httpString, "hxxp$1[://]");
     retval = retval.replaceAll(anyDomain, "$1[.]$3");
+    return retval;
+}
+
+function refangIoc(text: string): string {
+    /**
+     * refang an IOC (domain, URL, IP address)
+     */
+    let retval = text.replace('[.]', '.');
+    retval = retval.replace('hxxp', 'http');
+    retval = retval.replace('[:]', ':');
+    retval = retval.replace('[://]', '://');
+    console.log(`refanged ${retval}`)
     return retval;
 }
 
@@ -287,4 +301,15 @@ function validateDomain(domain: string, validTld: string[]): boolean {
     const tld = domain.split('.').pop()?.toUpperCase();
     if (tld && validTld.includes(tld)) return true;
     return false;
+}
+
+function removeArrayDuplicates(array: any[]): any[] {
+    /**
+     * removes duplicates from the passed array.
+     * @param array 
+     * @returns the array with duplicates removed
+     */
+    return array.filter((item, index) => {
+        return array.indexOf(item) === index;
+    });
 }
