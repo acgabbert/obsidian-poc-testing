@@ -210,11 +210,7 @@ export class PluginSidebar extends ItemView {
         });
     }
 
-    async getMatches(file: TFile) {
-        const fileContent = await this.app.vault.cachedRead(file);
-        this.ips = extractMatches(fileContent, this.ipRegex);
-        this.domains = extractMatches(fileContent, this.domainRegex);
-        this.refangIocs();
+    validateDomains() {
         if (this.validTld) {
             this.domains.forEach((domain, index, object) => {
                 if (!validateDomain(domain, this.validTld)) {
@@ -223,7 +219,15 @@ export class PluginSidebar extends ItemView {
                 }
             });
         }
+    }
+
+    async getMatches(file: TFile) {
+        const fileContent = await this.app.vault.cachedRead(file);
+        this.ips = extractMatches(fileContent, this.ipRegex);
+        this.domains = extractMatches(fileContent, this.domainRegex);
         this.hashes = extractMatches(fileContent, this.hashRegex);
+        this.refangIocs();
+        this.validateDomains();
         this.processExclusions();
     }
 
