@@ -212,12 +212,14 @@ export class PluginSidebar extends ItemView {
 
     validateDomains() {
         if (this.validTld) {
-            this.domains.forEach((domain, index, object) => {
+            let index = this.domains.length - 1;
+            while (index >= 0) {
+                const domain = this.domains[index];
                 if (!validateDomain(domain, this.validTld)) {
-                    console.log(`${domain} doesn't match`)
-                    object.splice(index, 1);
+                    this.domains.splice(index, 1);
                 }
-            });
+                index -= 1;
+            }
         }
     }
 
