@@ -44,12 +44,18 @@ export const googleSearch: searchSite = {
     domain: true
 }
 
+export const IP_EXCLUSIONS = ["127.0.0.1"]
+export const DOMAIN_EXCLUSIONS = ["google.com"]
+
 export const defaultSites: searchSite[] = [vtSearch, ipdbSearch, googleSearch];
 
 export class PluginSidebar extends ItemView {
     ips: string[];
+    ipExclusions: string[];
     domains: string[];
+    domainExclusions: string[];
     hashes: string[];
+    hashExclusions: string[]
     ipEl: HTMLDivElement;
     domainEl: HTMLDivElement;
     hashEl: HTMLDivElement;
@@ -79,6 +85,9 @@ export class PluginSidebar extends ItemView {
         this.domainRegex = DOMAIN_REGEX;
         if (validTld) this.validTld = validTld;
         if (searchSites) this.searchSites = searchSites;
+        this.ipExclusions = IP_EXCLUSIONS;
+        this.domainExclusions = DOMAIN_EXCLUSIONS;
+        this.hashExclusions = [];
     }
 
     getViewType(): string {
@@ -182,10 +191,23 @@ export class PluginSidebar extends ItemView {
     }
 
     refangIocs() {
-        this.ips = this.ips.map((x) => refangIoc(x));
-        this.domains = this.domains.map((x) => refangIoc(x));
+        this.ips = this.ips?.map((x) => refangIoc(x));
+        this.domains = this.domains?.map((x) => refangIoc(x));
         this.ips = removeArrayDuplicates(this.ips);
         this.domains = removeArrayDuplicates(this.domains);
+        this.hashes = this.hashes?.map((x) => x.toLowerCase());
+    }
+
+    processExclusions() {
+        this.domainExclusions?.forEach((domain) => {
+            if (this.domains.includes(domain)) this.domains.splice(this.domains.indexOf(domain), 1);
+        });
+        this.ipExclusions?.forEach((ip) => {
+            if (this.ips.includes(ip)) this.ips.splice(this.ips.indexOf(ip), 1);
+        });
+        this.hashExclusions?.forEach((hash) => {
+            if (this.hashes.includes(hash)) this.hashes.splice(this.hashes.indexOf(hash), 1);
+        });
     }
 
     async getMatches(file: TFile) {
@@ -202,6 +224,7 @@ export class PluginSidebar extends ItemView {
             });
         }
         this.hashes = extractMatches(fileContent, this.hashRegex);
+        this.processExclusions();
     }
 
     async updateView(file: TFile) {

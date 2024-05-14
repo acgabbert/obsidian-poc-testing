@@ -30,18 +30,30 @@ export const VT_ENT_SEARCH: ApiVals = {
     queryString: {"query": ""}
 }
 
-async function virusTotal(vals: ApiVals, val: string, key: string): Promise<JSON> {
+async function virusTotal(vals: ApiVals, val: string, key: string): Promise<VtResponse> {
     const headers = {'x-apikey': key};
     const vtParams = {url: vals.baseUrl + val, headers: headers, throw: true} as RequestUrlParam;
     const data = await request(vtParams);
-    return JSON.parse(data).data;
+    return JSON.parse(data).data as VtResponse;
 }
 
 export type VtResponse = {
     id: string
     type: string
     links: Record<string, string>
+    attributes: VtAttributes
+}
+
+export interface VtFileResponse extends VtResponse {
+    attributes: VtFileAttributes
+}
+
+export interface VtDomainResponse extends VtResponse {
     attributes: VtDomainAttributes
+}
+
+export interface VtIpResponse extends VtResponse {
+    attributes: VtIpAttributes
 }
 
 interface VtAttributes {
@@ -106,4 +118,8 @@ type YaraResult = {
     description: string
     author: string
     source: string
+}
+
+export interface VtIpAttributes extends VtAttributes {
+    
 }

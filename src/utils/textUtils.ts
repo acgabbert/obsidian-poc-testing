@@ -111,7 +111,8 @@ function refangIoc(text: string): string {
     retval = retval.replace('hxxp', 'http');
     retval = retval.replace('[:]', ':');
     retval = retval.replace('[://]', '://');
-    console.log(`refanged ${retval}`)
+    retval = retval.toLowerCase();
+    console.log(`refanged ${retval}`);
     return retval;
 }
 
