@@ -112,7 +112,6 @@ function refangIoc(text: string): string {
     retval = retval.replace('[:]', ':');
     retval = retval.replace('[://]', '://');
     retval = retval.toLowerCase();
-    console.log(`refanged ${retval}`);
     return retval;
 }
 
