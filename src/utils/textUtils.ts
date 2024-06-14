@@ -188,7 +188,8 @@ function extractMacros(text: string): string[] {
      * @param text
      * @returns a unique list of macros in the text
      */
-    const matches = text.matchAll(MACRO_REGEX);
+    let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
+    const matches = text.matchAll(regexTest);
     return addUniqueValuesToArray([], matches);
 }
 

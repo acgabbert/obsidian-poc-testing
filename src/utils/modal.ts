@@ -83,7 +83,8 @@ class InputModal extends Modal {
         let activeNote = await getActiveNoteContent(this.app);
         contentEl.createEl("h1", {text: "Input Parameters:"});
         this.macros.forEach((contentMacro) => {
-            const regexResults = MACRO_REGEX.exec(contentMacro);
+            let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
+            const regexResults = regexTest.exec(contentMacro);
             let displayMacro = contentMacro;
             if (regexResults) {
                 const macroWord = regexResults[2].toLowerCase();
