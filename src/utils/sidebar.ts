@@ -15,6 +15,8 @@ export interface searchSite {
     ip: boolean
     hash: boolean
     domain: boolean
+    multisearch: boolean
+    separator?: string
 }
 
 export const vtSearch: searchSite = {
@@ -23,7 +25,9 @@ export const vtSearch: searchSite = {
     site: VT_SEARCH,
     ip: true,
     hash: true,
-    domain: true
+    domain: true,
+    multisearch: true,
+    separator: '%20'
 }
 
 export const ipdbSearch: searchSite = {
@@ -32,7 +36,8 @@ export const ipdbSearch: searchSite = {
     site: IPDB_SEARCH,
     ip: true,
     hash: false,
-    domain: true
+    domain: true,
+    multisearch: false
 }
 
 export const googleSearch: searchSite = {
@@ -41,7 +46,8 @@ export const googleSearch: searchSite = {
     site: GOOGLE_SEARCH,
     ip: true,
     hash: true,
-    domain: true
+    domain: true,
+    multisearch: false
 }
 
 export const IP_EXCLUSIONS = ["127.0.0.1"]
