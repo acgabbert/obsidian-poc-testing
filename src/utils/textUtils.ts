@@ -96,8 +96,8 @@ function defangDomain(text: string): string {
      * becomes `hxxps[://]google[.]com`
      * @returns input string with domains defanged
      */
-    const httpString = /http(s?):\/\//g;
-    const anyDomain = /(([a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.?)+)\.((xn--)?([a-z][a-z0-9\-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/g;
+    const httpString = /http(s?):\/\//gi;
+    const anyDomain = /(([\w-]\.?)+)\.((xn--)?([a-z][a-z0-9\-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/gi;
     let retval = text.replaceAll(httpString, "hxxp$1[://]");
     retval = retval.replaceAll(anyDomain, "$1[.]$3");
     return retval;
