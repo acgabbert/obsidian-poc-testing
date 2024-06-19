@@ -17,6 +17,7 @@ export interface searchSite {
     domain: boolean
     multisearch: boolean
     separator?: string
+    enabled: boolean
 }
 
 export const vtSearch: searchSite = {
@@ -27,7 +28,8 @@ export const vtSearch: searchSite = {
     hash: true,
     domain: true,
     multisearch: true,
-    separator: '%20'
+    separator: '%20',
+    enabled: true
 }
 
 export const ipdbSearch: searchSite = {
@@ -37,7 +39,8 @@ export const ipdbSearch: searchSite = {
     ip: true,
     hash: false,
     domain: true,
-    multisearch: false
+    multisearch: false,
+    enabled: true
 }
 
 export const googleSearch: searchSite = {
@@ -47,7 +50,8 @@ export const googleSearch: searchSite = {
     ip: true,
     hash: true,
     domain: true,
-    multisearch: false
+    multisearch: false,
+    enabled: true
 }
 
 export const IP_EXCLUSIONS = ["127.0.0.1"]
@@ -126,7 +130,6 @@ export class PluginSidebar extends ItemView {
     registerActiveFileListener() {
         this.registerEvent(
             this.app.vault.on('modify', async (file: TFile) => {
-                console.log(`file updated: ${file.path}`);
                 if (file === this.app.workspace.getActiveFile()) {
                     await this.updateView(file);
                 }
@@ -137,7 +140,6 @@ export class PluginSidebar extends ItemView {
     registerOpenFile() {
         this.registerEvent(
             this.app.workspace.on('file-open', async (file: TFile) => {
-                console.log(`file opened: ${file.path}`);
                 if (file === this.app.workspace.getActiveFile()) {
                     await this.updateView(file);
                 }
@@ -160,6 +162,7 @@ export class PluginSidebar extends ItemView {
         el.createDiv({cls: "tree-item-inner", text: indicator});
         const buttonEl = parentEl.createDiv({cls: this.tableContainerClass}).createEl("table").createEl("tr", {cls: this.tableClass});
         this.searchSites.forEach((search) => {
+            if (!search.enabled) return;
             switch(indicatorType) {
                 case 'ip': {
                     if (search.ip) {

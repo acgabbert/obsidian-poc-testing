@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 import MyPlugin from "main";
-import { removeDotObsidian } from "./utils";
+import { defaultSites, removeDotObsidian, searchSite } from "./utils";
 
 export { DEFAULT_SETTINGS, MySettingTab };
 export type { MyPluginSettings };
@@ -13,6 +13,7 @@ interface MyPluginSettings {
 	vtApiKey: string;
 	ipdbApiKey: string;
 	validTld: string[];
+	searchSites: searchSite[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -21,7 +22,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
     codeFile: '',
 	vtApiKey: '',
 	ipdbApiKey: '',
-	validTld: new Array()
+	validTld: new Array(),
+	searchSites: defaultSites
 }
 
 class MySettingTab extends PluginSettingTab {
@@ -85,5 +87,19 @@ class MySettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				})
 			})
+		new Setting(containerEl)
+			.setName('Search Engines')
+			.setHeading();
+		this.plugin.settings.searchSites.forEach((site: searchSite) => {
+			new Setting(containerEl)
+				.setName(site.name)
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.searchSites[this.plugin.settings.searchSites.indexOf(site)].enabled)
+					.onChange(async (value) => {
+						this.plugin.settings.searchSites[this.plugin.settings.searchSites.indexOf(site)].enabled = value;
+						await this.plugin.saveSettings();
+					})
+				)
+		})
 	}
 }

@@ -14,7 +14,6 @@ function addButtonContainer(workspace: Workspace, file: TFile, className: string
         });
     }
     if (rootFolder && !file.path.includes(rootFolder)) {
-        console.log('File not in specified root folder');
         return;
     }
     const header = container.querySelector('.view-header');
