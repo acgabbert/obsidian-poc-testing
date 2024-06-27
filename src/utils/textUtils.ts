@@ -107,10 +107,10 @@ function refangIoc(text: string): string {
     /**
      * refang an IOC (domain, URL, IP address)
      */
-    let retval = text.replace('[.]', '.');
-    retval = retval.replace('hxxp', 'http');
-    retval = retval.replace('[:]', ':');
-    retval = retval.replace('[://]', '://');
+    let retval = text.replaceAll('[.]', '.');
+    retval = retval.replaceAll('hxxp', 'http');
+    retval = retval.replaceAll('[:]', ':');
+    retval = retval.replaceAll('[://]', '://');
     retval = retval.toLowerCase();
     return retval;
 }
