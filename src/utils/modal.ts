@@ -92,7 +92,8 @@ class InputModal extends Modal {
             }
             let match = false;
             this.supportedMacros.forEach((value, key) => {
-                if (!key.test(contentMacro) || !activeNote) return;
+                const tester = new RegExp(key.source, key.flags);
+                if (!tester.test(contentMacro) || !activeNote) return;
                 const matches = extractMatches(activeNote, value);
                 if (!(matches.length > 0)) return;
                 match = true;
