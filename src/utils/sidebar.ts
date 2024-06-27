@@ -62,10 +62,13 @@ export const defaultSites: searchSite[] = [vtSearch, ipdbSearch, googleSearch];
 export class PluginSidebar extends ItemView {
     ips: string[];
     ipExclusions: string[];
+    ipMultisearch: Map<string, string>;
     domains: string[];
     domainExclusions: string[];
+    domainMultisearch: Map<string, string>;
     hashes: string[];
     hashExclusions: string[]
+    hashMultisearch: Map<string, string>;
     ipEl: HTMLDivElement;
     domainEl: HTMLDivElement;
     hashEl: HTMLDivElement;
@@ -98,6 +101,9 @@ export class PluginSidebar extends ItemView {
         this.ipExclusions = IP_EXCLUSIONS;
         this.domainExclusions = DOMAIN_EXCLUSIONS;
         this.hashExclusions = [];
+        this.ipMultisearch = new Map();
+        this.domainMultisearch = new Map();
+        this.hashMultisearch = new Map();
     }
 
     getViewType(): string {
@@ -194,8 +200,13 @@ export class PluginSidebar extends ItemView {
     clearSidebar(container: Element): void {
         const listEls = container.getElementsByClassName(this.listClass);
         const buttonEls = container.getElementsByClassName(this.tableContainerClass);
+        const searchAllEls = container.getElementsByClassName(this.tableContainerClass);
+        this.ipMultisearch.clear();
+        this.domainMultisearch.clear();
+        this.hashMultisearch.clear();
         removeElements(listEls);
         removeElements(buttonEls);
+        removeElements(searchAllEls);
         return;
     }
 
@@ -242,20 +253,40 @@ export class PluginSidebar extends ItemView {
         this.processExclusions();
     }
 
+    processIndicators(parentEl: HTMLElement, indicatorArray: string[], indicatorType: string, indicatorMultisearch: Map<string, string>) {
+        indicatorArray.forEach((indicator) => {
+            this.addIndicatorEl(parentEl, indicator, indicatorType);
+            this.searchSites.forEach((site) => {
+                if (site.multisearch) {
+                    if (!indicatorMultisearch.has(site.shortName)) {
+                        indicatorMultisearch.set(site.shortName, site.site.replace('%s', indicator));
+                    } else {
+                        let url = indicatorMultisearch.get(site.shortName);
+                        if (!url) {
+                            indicatorMultisearch.set(site.shortName, site.site.replace('%s', indicator));
+                        } else if (!url.includes(indicator)) {
+                            indicatorMultisearch.set(site.shortName, url + site.separator + indicator);
+                        }
+                    }
+                }
+            })
+        });
+        const summaryEl = parentEl.parentElement;
+        if (!summaryEl || indicatorArray.length < 2) return;
+        const buttonEl = parentEl.createDiv({cls: this.tableContainerClass}).createEl("table").createEl("tr", {cls: this.tableClass});
+        indicatorMultisearch.forEach((value, key) => {
+            this.addButton(buttonEl, `Search All - ${key}`, value);
+        });
+    }
+
     async updateView(file: TFile) {
         await this.getMatches(file);
         const container = this.containerEl.children[1];
         this.clearSidebar(container);
-        
-        this.ips.forEach((ip) => {
-            this.addIndicatorEl(this.ipEl, ip, 'ip');
-        });
-        this.domains.forEach((domain) => {
-            this.addIndicatorEl(this.domainEl, domain, 'domain');
-        });
-        this.hashes.forEach((hash) => {
-            this.addIndicatorEl(this.hashEl, hash, 'hash');
-        });
+        console.log(this.ipEl);
+        this.processIndicators(this.ipEl, this.ips, 'ip', this.ipMultisearch);
+        this.processIndicators(this.domainEl, this.domains, 'domain', this.domainMultisearch);
+        this.processIndicators(this.hashEl, this.hashes, 'hash', this.hashMultisearch);
     }
 
     protected async onClose(): Promise<void> {
