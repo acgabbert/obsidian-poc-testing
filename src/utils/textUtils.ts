@@ -136,7 +136,7 @@ function lowerMd5(text: string): string {
     });
 }
 
-const dateTimeRegex = /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\s+UTC)/g;
+export const dateTimeRegex = /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\s+UTC)/g;
 function friendlyDatetime(text: string): string {
     /**
      * Converts a datetime string in the format `YYYY-MM-DD HH:MM:SS UTC`
