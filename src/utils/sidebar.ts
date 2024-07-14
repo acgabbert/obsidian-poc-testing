@@ -283,7 +283,6 @@ export class PluginSidebar extends ItemView {
         await this.getMatches(file);
         const container = this.containerEl.children[1];
         this.clearSidebar(container);
-        console.log(this.ipEl);
         this.processIndicators(this.ipEl, this.ips, 'ip', this.ipMultisearch);
         this.processIndicators(this.domainEl, this.domains, 'domain', this.domainMultisearch);
         this.processIndicators(this.hashEl, this.hashes, 'hash', this.hashMultisearch);
