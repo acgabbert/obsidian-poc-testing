@@ -257,7 +257,7 @@ export class PluginSidebar extends ItemView {
         indicatorArray.forEach((indicator) => {
             this.addIndicatorEl(parentEl, indicator, indicatorType);
             this.searchSites.forEach((site) => {
-                if (site.multisearch) {
+                if (site.multisearch && site.enabled) {
                     if (!indicatorMultisearch.has(site.shortName)) {
                         indicatorMultisearch.set(site.shortName, site.site.replace('%s', indicator));
                     } else {

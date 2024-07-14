@@ -292,7 +292,7 @@ function parseCodeBlocks(content: string): Map<string, Code> {
 }
 
 export const macroSeparator = "(?:\\s*[:=]\\s*|\\s+)";
-export const macroValue = "([^\\}\\s]+)";
+export const macroValue = "(((?:[^\\}\\s]*\\w[^\\}\\s]*)+))";
 function constructMacroRegex(macroRegex: string | RegExp): RegExp {
     if (macroRegex instanceof RegExp) macroRegex = macroRegex.source;
     const retval = new RegExp(macroRegex + macroSeparator + macroValue, "gi");
