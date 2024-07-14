@@ -16,15 +16,20 @@ export interface Code {
     icon?: string
 }
 
+type Class<CodeModal> = new (...args: any[]) => CodeModal;
+
 class CodeListModal extends SuggestModal<string> {
     content: Map<string, Code>;
     macros: Map<RegExp, RegExp[]>;
+    codeModal: Class<CodeModal>;
 
-    constructor(app: App, content: Map<string, Code>, macros?: Map<RegExp, RegExp[]>) {
+    constructor(app: App, content: Map<string, Code>, macros?: Map<RegExp, RegExp[]>, codeModal?: Class<CodeModal>) {
         super(app);
         this.content = content;
         this.macros = supportedMacros;
         if (macros) this.macros = macros;
+        if (codeModal) this.codeModal = codeModal;
+        else this.codeModal = CodeModal;
     }
 
     getSuggestions(query: string): string[] | Promise<string[]> {
@@ -56,9 +61,9 @@ class CodeListModal extends SuggestModal<string> {
             // can pass on:
             // - the selected script
             // - the extracted macros
-            new InputModal(this.app, result, extractedMacros).open();
+            new InputModal(this.app, result, extractedMacros, null, this.codeModal).open();
         } else {
-            new CodeModal(this.app, result).open();
+            new this.codeModal(this.app, result).open();
         }
     }
 }
@@ -68,14 +73,17 @@ class InputModal extends Modal {
     macros: string[];
     replacements: Map<string, string>;
     supportedMacros: Map<RegExp, RegExp[]>;
+    codeModal: Class<CodeModal>;
 
-    constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp[]>) {
+    constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp[]> | null, codeModal?: Class<CodeModal>) {
         super(app);
         this.content = content;
         this.macros = macros;
         this.replacements = new Map();
         this.supportedMacros = supportedMacros;
         if (passedMacros) this.supportedMacros = passedMacros;
+        if (codeModal) this.codeModal = codeModal;
+        else this.codeModal = CodeModal;
     }
 
     async onOpen(): Promise<void> {
@@ -155,7 +163,7 @@ class InputModal extends Modal {
         this.replacements.forEach((value, key) => {
             this.content = this.content.replaceAll(key, value);
         })
-        new CodeModal(this.app, this.content).open();
+        new this.codeModal(this.app, this.content).open();
     }
 }
 
