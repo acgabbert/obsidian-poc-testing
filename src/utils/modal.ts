@@ -75,6 +75,7 @@ class InputModal extends Modal {
     replacements: Map<string, string>;
     supportedMacros: Map<RegExp, RegExp[]>;
     codeModal: Class<CodeModal>;
+    datePicker: boolean;
 
     constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp[]> | null, codeModal?: Class<CodeModal>) {
         super(app);
@@ -82,6 +83,7 @@ class InputModal extends Modal {
         this.macros = macros;
         this.replacements = new Map();
         this.supportedMacros = supportedMacros;
+        this.datePicker = true;
         if (passedMacros) this.supportedMacros = passedMacros;
         if (codeModal) this.codeModal = codeModal;
         else this.codeModal = CodeModal;
@@ -140,12 +142,19 @@ class InputModal extends Modal {
                         this.replacements.set(contentMacro, input);
                     })
                 })
+        })
+        if (this.datePicker) {
             let fromDate = '';
-            datePickerSettingEl(contentEl).addEventListener("change", (event) => {
+            datePickerSettingEl(contentEl, "From Date", "From Date").addEventListener("change", (event) => {
                 fromDate = (<HTMLInputElement>event.target)?.value;
                 console.log(fromDate);
             });
-        })
+            let toDate = '';
+            datePickerSettingEl(contentEl, "To Date").addEventListener("change", (event) => {
+                toDate = (<HTMLInputElement>event.target)?.value;
+                console.log(toDate);
+            });
+        }
         new Setting(contentEl)
             .addButton((btn) => {
                 btn.setButtonText("Submit").setCta().onClick(() => {

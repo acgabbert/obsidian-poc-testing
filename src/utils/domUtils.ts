@@ -28,13 +28,14 @@ function openDetails(els: HTMLCollectionOf<HTMLDetailsElement>) {
     }
 }
 
-function datePickerSettingEl(parentEl: HTMLElement, value?: string): HTMLInputElement {
+function datePickerSettingEl(parentEl: HTMLElement, value?: string, name?: string): HTMLInputElement {
     /**
      * Add a date picker "setting" 
      */
-    if (!value) value = new Date(Date.now()).toISOString();
+    value = value || new Date(Date.now()).toISOString();
+    name = name || 'Date Picker';
     console.log(`time: ${value}`)
-    const fromDate = new Setting(parentEl).setName('Date Picker').settingEl;
+    const fromDate = new Setting(parentEl).setName(name).settingEl;
     const fromDateEl = document.createElement("input");
     fromDateEl.setAttribute("type", "datetime-local");
     fromDateEl.setAttribute("value", value)
