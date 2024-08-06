@@ -1,4 +1,6 @@
-export { openDetails, removeElements }
+import { Setting } from "obsidian";
+
+export { datePickerSettingEl, openDetails, removeElements }
 
 function removeElements(els: HTMLCollectionOf<Element>) {
     /**
@@ -24,4 +26,18 @@ function openDetails(els: HTMLCollectionOf<HTMLDetailsElement>) {
             } catch { }
         });
     }
+}
+
+function datePickerSettingEl(parentEl: HTMLElement, value?: string): HTMLInputElement {
+    /**
+     * Add a date picker "setting" 
+     */
+    if (!value) value = new Date(Date.now()).toISOString();
+    console.log(`time: ${value}`)
+    const fromDate = new Setting(parentEl).setName('Date Picker').settingEl;
+    const fromDateEl = document.createElement("input");
+    fromDateEl.setAttribute("type", "datetime-local");
+    fromDateEl.setAttribute("value", value)
+    fromDate.appendChild(fromDateEl);
+    return fromDateEl;
 }

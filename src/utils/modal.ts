@@ -1,6 +1,7 @@
 import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
 import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, MACRO_REGEX, replaceMacros } from "./textUtils";
 import { getActiveNoteContent } from "./workspaceUtils";
+import { datePickerSettingEl } from "./domUtils";
 
 export { CodeListModal, CodeModal, ErrorModal, InputModal };
 
@@ -139,6 +140,11 @@ class InputModal extends Modal {
                         this.replacements.set(contentMacro, input);
                     })
                 })
+            let fromDate = '';
+            datePickerSettingEl(contentEl).addEventListener("change", (event) => {
+                fromDate = (<HTMLInputElement>event.target)?.value;
+                console.log(fromDate);
+            });
         })
         new Setting(contentEl)
             .addButton((btn) => {

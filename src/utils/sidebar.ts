@@ -80,12 +80,12 @@ export class PluginSidebar extends ItemView {
     hashRegex: RegExp;
     domainRegex: RegExp;
 
-    private sidebarContainerClass = "sidebar-container tree-item";
-    private listClass = "sidebar-list-item";
-    private listItemClass = this.listClass + " tree-item-self";
-    private tableContainerClass = "table-container";
-    private tableClass = "sidebar-table-row";
-    private tdClass = "sidebar-table-item";
+    sidebarContainerClass = "sidebar-container tree-item";
+    listClass = "sidebar-list-item";
+    listItemClass = this.listClass + " tree-item-self";
+    tableContainerClass = "table-container";
+    tableClass = "sidebar-table-row";
+    tdClass = "sidebar-table-item";
 
     constructor(leaf: WorkspaceLeaf, searchSites?: searchSite[], validTld?: string[]) {
         super(leaf);
