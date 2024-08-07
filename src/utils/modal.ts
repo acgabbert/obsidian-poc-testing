@@ -20,6 +20,7 @@ export interface Code {
 export class ScriptObject {
     code: Code;
     dated: boolean;
+    baseTimestamp?: number;
     fromTime?: number;
     toTime?: number;
     macros: string[];
@@ -27,7 +28,7 @@ export class ScriptObject {
 
     constructor(code: Code, dated?: boolean) {
         this.code = code;
-        this.replacedCode = code.content;
+        this.replacedCode = this.code.content;
         this.macros = extractMacros(this.code.content);
         this.dated = dated || false;
     }
@@ -90,7 +91,7 @@ class CodeListModal extends SuggestModal<string> {
             // - the extracted macros
             new InputModal(this.app, selectedCode, null, this.codeModal).open();
         } else {
-            new this.codeModal(this.app, result).open();
+            new this.codeModal(this.app, selectedCode).open();
         }
     }
 }
@@ -112,12 +113,9 @@ class InputModal extends Modal {
         if (codeModal) this.codeModal = codeModal;
         else this.codeModal = CodeModal;
     }
-
-    async onOpen(): Promise<void> {
-        const {contentEl} = this;
-        let activeNote = await getActiveNoteContent(this.app);
-        contentEl.createEl("h1", {text: "Input Parameters:"});
-        this.content.macros.forEach((contentMacro) => {
+    
+    addMacros(activeNote: string | null, contentEl: HTMLElement) {
+    		this.content.macros.forEach((contentMacro) => {
             let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
             const regexResults = regexTest.exec(contentMacro);
             let displayMacro = contentMacro;
@@ -167,18 +165,27 @@ class InputModal extends Modal {
                     })
                 })
         })
-        if (this.content.dated) {
-            let fromDate = '';
-            datePickerSettingEl(contentEl, "2017-06-01T08:30", "From Date").addEventListener("change", (event) => {
+    }
+    
+    addDatePicker(contentEl: HTMLElement) {
+    		if (this.content.dated) {
+    			datePickerSettingEl(contentEl, this.content.fromTime, "From Date").addEventListener("change", (event) => {
                 this.content.fromTime = Date.parse((<HTMLInputElement>event.target)?.value);
                 console.log(this.content.fromTime);
             });
-            let toDate = '';
-            datePickerSettingEl(contentEl, "To Date").addEventListener("change", (event) => {
+            datePickerSettingEl(contentEl, this.content.toTime, "To Date").addEventListener("change", (event) => {
                 this.content.toTime = Date.parse((<HTMLInputElement>event.target)?.value);
                 console.log(this.content.toTime);
             });
-        }
+    		}
+    }
+
+    async onOpen(): Promise<void> {
+        const {contentEl} = this;
+        let activeNote = await getActiveNoteContent(this.app);
+        contentEl.createEl("h1", {text: "Input Parameters:"});
+        this.addMacros(activeNote, contentEl);
+        this.addDatePicker(contentEl);
         new Setting(contentEl)
             .addButton((btn) => {
                 btn.setButtonText("Submit").setCta().onClick(() => {
