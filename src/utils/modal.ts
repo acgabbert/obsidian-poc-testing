@@ -1,5 +1,5 @@
 import { App, Modal, Notice, Setting, SuggestModal } from "obsidian";
-import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, MACRO_REGEX, replaceMacros } from "./textUtils";
+import { constructMacroRegex, extractMacros, extractMatches, FILE_REGEX, MACRO_REGEX } from "./textUtils";
 import { getActiveNoteContent } from "./workspaceUtils";
 import { datePickerSettingEl } from "./domUtils";
 
@@ -15,6 +15,31 @@ export interface Code {
     content: string,
     lang: string,
     icon?: string
+}
+
+export class ScriptObject {
+    code: Code;
+    dated: boolean;
+    fromTime?: number;
+    toTime?: number;
+    macros: string[];
+    replacedCode: string;
+
+    constructor(code: Code, dated?: boolean) {
+        this.code = code;
+        this.replacedCode = code.content;
+        this.macros = extractMacros(this.code.content);
+        this.dated = dated || false;
+    }
+
+    replaceMacros(replacements: Map<string, string>): void {
+        replacements.forEach((value, key) => {
+            console.log(key, value);
+            console.log(this.code.content.contains(key));
+            this.replacedCode = this.replacedCode.replaceAll(key, value);
+        });
+        if (replacements.size < 1) this.replacedCode = this.code.content;
+    }
 }
 
 type Class<CodeModal> = new (...args: any[]) => CodeModal;
@@ -57,12 +82,13 @@ class CodeListModal extends SuggestModal<string> {
     
     onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
         let result = this.content.get(item)!.content;
+        const selectedCode = new ScriptObject(this.content.get(item)!, true)
         const extractedMacros = extractMacros(result);
         if (extractedMacros.length > 0) {
             // can pass on:
             // - the selected script
             // - the extracted macros
-            new InputModal(this.app, result, extractedMacros, null, this.codeModal).open();
+            new InputModal(this.app, selectedCode, null, this.codeModal).open();
         } else {
             new this.codeModal(this.app, result).open();
         }
@@ -70,17 +96,15 @@ class CodeListModal extends SuggestModal<string> {
 }
 
 class InputModal extends Modal {
-    content: string;
-    macros: string[];
+    content: ScriptObject;
     replacements: Map<string, string>;
     supportedMacros: Map<RegExp, RegExp[]>;
     codeModal: Class<CodeModal>;
     datePicker: boolean;
 
-    constructor(app: App, content: string, macros: string[], passedMacros?: Map<RegExp, RegExp[]> | null, codeModal?: Class<CodeModal>) {
+    constructor(app: App, content: ScriptObject, passedMacros?: Map<RegExp, RegExp[]> | null, codeModal?: Class<CodeModal>) {
         super(app);
         this.content = content;
-        this.macros = macros;
         this.replacements = new Map();
         this.supportedMacros = supportedMacros;
         this.datePicker = true;
@@ -93,7 +117,7 @@ class InputModal extends Modal {
         const {contentEl} = this;
         let activeNote = await getActiveNoteContent(this.app);
         contentEl.createEl("h1", {text: "Input Parameters:"});
-        this.macros.forEach((contentMacro) => {
+        this.content.macros.forEach((contentMacro) => {
             let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
             const regexResults = regexTest.exec(contentMacro);
             let displayMacro = contentMacro;
@@ -143,16 +167,16 @@ class InputModal extends Modal {
                     })
                 })
         })
-        if (this.datePicker) {
+        if (this.content.dated) {
             let fromDate = '';
-            datePickerSettingEl(contentEl, "From Date", "From Date").addEventListener("change", (event) => {
-                fromDate = (<HTMLInputElement>event.target)?.value;
-                console.log(fromDate);
+            datePickerSettingEl(contentEl, "2017-06-01T08:30", "From Date").addEventListener("change", (event) => {
+                this.content.fromTime = Date.parse((<HTMLInputElement>event.target)?.value);
+                console.log(this.content.fromTime);
             });
             let toDate = '';
             datePickerSettingEl(contentEl, "To Date").addEventListener("change", (event) => {
-                toDate = (<HTMLInputElement>event.target)?.value;
-                console.log(toDate);
+                this.content.toTime = Date.parse((<HTMLInputElement>event.target)?.value);
+                console.log(this.content.toTime);
             });
         }
         new Setting(contentEl)
@@ -175,9 +199,8 @@ class InputModal extends Modal {
     onClose(): void {
         const {contentEl} = this;
         contentEl.empty();
-        this.replacements.forEach((value, key) => {
-            this.content = this.content.replaceAll(key, value);
-        })
+        console.log(this.replacements)
+        this.content.replaceMacros(this.replacements);
         new this.codeModal(this.app, this.content).open();
     }
 }
@@ -203,9 +226,9 @@ class ErrorModal extends Modal {
 }
 
 class CodeModal extends Modal {
-    code: string;
+    code: ScriptObject;
 
-    constructor(app: App, code: string) {
+    constructor(app: App, code: ScriptObject) {
         super(app);
         this.code = code;
     }
@@ -218,10 +241,11 @@ class CodeModal extends Modal {
                 .setButtonText("Copy to clipboard")
                 .setCta()
                 .onClick(async () => {
-                    await navigator.clipboard.writeText(this.code);
+                    if (!this.code.replacedCode)
+                    await navigator.clipboard.writeText(this.code.replacedCode);
                     new Notice('Copied to clipboard!');
                 }));
-        contentEl.createEl("code", {text: this.code, cls: "code__modal"});
+        contentEl.createEl("code", {text: this.code.replacedCode, cls: "code__modal"});
     }
 
     onClose() {

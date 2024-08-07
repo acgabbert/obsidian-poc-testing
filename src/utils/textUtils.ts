@@ -3,6 +3,7 @@ import { Code, InputModal } from "./modal";
 export {
     addUniqueValuesToArray,
     constructMacroRegex,
+    convertTime,
     defangIp,
     defangDomain,
     extractMacros,
@@ -12,7 +13,6 @@ export {
     getValidTld,
     lowerSha256,
     lowerMd5,
-    parameterizeCodeBlock,
     parseCodeBlocks,
     refangIoc,
     removeArrayDuplicates,
@@ -227,32 +227,6 @@ function replaceMacros(text: string, replacements: Map<string, string>): string 
     return retval;
 }
 
-async function parameterizeCodeBlock(evt: MouseEvent, app: App): Promise<string> {
-    /**
-     * Upon copying a code block in preview mode, 
-     * replace macros surrounded by double curly braces 
-     * e.g. {{macro}}
-     * with user input.
-     * @param evt a mouse event
-     * @param app the current App class instance
-     * @returns the code block text with macros replaces
-     */
-    let text = "";
-    const target = <HTMLButtonElement>evt.target;
-    // check for copy code button in preview mode
-    if (target.parentElement?.firstChild && target['className'] === 'copy-code-button') {
-        const child = <HTMLElement>target.parentElement.firstChild;
-        text = <string>child.innerText;
-        let macroArray = extractMacros(text);
-        if (macroArray.length > 0) {
-            new InputModal(app, text, macroArray);
-        } else {
-            console.log('No parameter matches');
-        }
-    }
-    return text;
-}
-
 function addUniqueValuesToArray(array: string[], values: IterableIterator<RegExpMatchArray>): string[] {
     /**
      * Add unique values from the passed RegExpMatchArray to the given array of strings
@@ -314,4 +288,12 @@ function removeArrayDuplicates(array: any[]): any[] {
     return array.filter((item, index) => {
         return array.indexOf(item) === index;
     });
+}
+
+function convertTime(timeString: string): number {
+    return Date.parse(timeString);
+}
+
+function formatInputTime(date: number): string {
+    return "";
 }
