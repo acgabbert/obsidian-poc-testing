@@ -35,8 +35,6 @@ export class ScriptObject {
 
     replaceMacros(replacements: Map<string, string>): void {
         replacements.forEach((value, key) => {
-            console.log(key, value);
-            console.log(this.code.content.contains(key));
             this.replacedCode = this.replacedCode.replaceAll(key, value);
         });
         if (replacements.size < 1) this.replacedCode = this.code.content;
@@ -204,7 +202,6 @@ class InputModal extends Modal {
     onClose(): void {
         const {contentEl} = this;
         contentEl.empty();
-        console.log(this.replacements)
         this.content.replaceMacros(this.replacements);
         new this.codeModal(this.app, this.content).open();
     }

@@ -250,7 +250,7 @@ function parseCodeBlocks(content: string): Map<string, Code> {
      * @returns a mapping of headers to code blcok content
      */
     const retval = new Map();
-    const codeBlockRegex = /#+\s+(.+)$\n+```(\w*)\n(((?!^```\n).|\n)*)\n^```$/gm;
+    const codeBlockRegex = /#+\s+(.+)$\n+```([\w-_\s]*)\n(((?!^```\n).|\n)*)\n^```$/gm;
     const matches = content.matchAll(codeBlockRegex);
     const matchArray = [...matches];
     matchArray.forEach((match) => {

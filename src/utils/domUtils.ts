@@ -20,7 +20,6 @@ function removeElements(els: HTMLCollectionOf<Element>) {
 function openDetails(els: HTMLCollectionOf<HTMLDetailsElement>) {
     if (els && els.length > 0) {
         Array.from(els).forEach((el: HTMLDetailsElement) => {
-            console.log(`trying to open ${el}`)
             try {
                 el.open = true;
             } catch { }
@@ -34,7 +33,6 @@ function datePickerSettingEl(parentEl: HTMLElement, value?: string, name?: strin
      */
     value = value || new Date(Date.now()).toISOString();
     name = name || 'Date Picker';
-    console.log(`time: ${value}`)
     const fromDate = new Setting(parentEl).setName(name).settingEl;
     const fromDateEl = document.createElement("input");
     fromDateEl.setAttribute("type", "datetime-local");
