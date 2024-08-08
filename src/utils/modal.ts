@@ -169,7 +169,7 @@ class InputModal extends Modal {
     
     addDatePicker(contentEl: HTMLElement) {
     	if (this.content.dated && this.content.fromTime && this.content.toTime) {
-    			datePickerSettingEl(contentEl, new Date(this.content.fromTime).toISOString().slice(0,-8), "From Date").addEventListener("change", (event) => {
+            datePickerSettingEl(contentEl, new Date(this.content.fromTime).toISOString().slice(0,-8), "From Date").addEventListener("change", (event) => {
                 this.content.fromTime = Date.parse((<HTMLInputElement>event.target)?.value);
             });
             datePickerSettingEl(contentEl, new Date(this.content.toTime).toISOString().slice(0,-8), "To Date").addEventListener("change", (event) => {
