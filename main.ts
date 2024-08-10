@@ -152,7 +152,7 @@ export default class MyPlugin extends Plugin {
 							const attributes = data.attributes as VtDomainAttributes;
 							console.log(data);
 							console.log(attributes.last_analysis_stats);
-							appendToEnd(this.app, file, `\`\`\`ApiResult\n${JSON.stringify(attributes.last_analysis_stats)}\n\`\`\``);
+							appendToEnd(this.app, file, `\`\`\`ApiResult\n${selection}\n${JSON.stringify(attributes.last_analysis_stats, null, 2)}\n\`\`\``);
 						}
 					}
 				})
