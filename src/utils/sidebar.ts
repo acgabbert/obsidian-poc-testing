@@ -193,7 +193,6 @@ export class PluginSidebar extends ItemView {
                 case 'domain': {
                     if (search.domain) {
                         this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
-                        this.addApiButton(buttonEl.createEl("td", {cls: this.tdClass}), `${search.shortName} API`, indicator)
                     }
                     break;
                 }
