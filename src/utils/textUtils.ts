@@ -110,7 +110,7 @@ function defangEmail(text: string): string {
      * Defangs email addresses
      * @returns input string with email addresses defanged
      */
-    const emailString = /([^\s]+[^\s]+)@()\.([^\s]+)/gi;
+    const emailString = /([^\s]+)@([^\s]+)\.([^\s]+)/gi;
     let retval = text.replaceAll(emailString, "$1[@]$2[.]$3");
     return retval;
 }
