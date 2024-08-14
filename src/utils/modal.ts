@@ -35,8 +35,6 @@ export class ScriptObject {
 
     replaceMacros(replacements: Map<string, string>): void {
         replacements.forEach((value, key) => {
-            console.log(key, value);
-            console.log(this.code.content.contains(key));
             this.replacedCode = this.replacedCode.replaceAll(key, value);
         });
         if (replacements.size < 1) this.replacedCode = this.code.content;
@@ -115,7 +113,7 @@ class InputModal extends Modal {
     }
     
     addMacros(activeNote: string | null, contentEl: HTMLElement) {
-    		this.content.macros.forEach((contentMacro) => {
+    	this.content.macros.forEach((contentMacro) => {
             let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
             const regexResults = regexTest.exec(contentMacro);
             let displayMacro = contentMacro;
@@ -168,14 +166,14 @@ class InputModal extends Modal {
     }
     
     addDatePicker(contentEl: HTMLElement) {
-    		if (this.content.dated && this.content.fromTime && this.content.toTime) {
-    			datePickerSettingEl(contentEl, new Date(this.content.fromTime).toISOString().slice(0,-8), "From Date").addEventListener("change", (event) => {
+    	if (this.content.dated && this.content.fromTime && this.content.toTime) {
+            datePickerSettingEl(contentEl, new Date(this.content.fromTime).toISOString().slice(0,-8), "From Date").addEventListener("change", (event) => {
                 this.content.fromTime = Date.parse((<HTMLInputElement>event.target)?.value);
             });
             datePickerSettingEl(contentEl, new Date(this.content.toTime).toISOString().slice(0,-8), "To Date").addEventListener("change", (event) => {
                 this.content.toTime = Date.parse((<HTMLInputElement>event.target)?.value);
             });
-    		}
+    	}
     }
 
     async onOpen(): Promise<void> {
@@ -204,7 +202,6 @@ class InputModal extends Modal {
     onClose(): void {
         const {contentEl} = this;
         contentEl.empty();
-        console.log(this.replacements)
         this.content.replaceMacros(this.replacements);
         new this.codeModal(this.app, this.content).open();
     }

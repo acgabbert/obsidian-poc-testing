@@ -1,6 +1,8 @@
 import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
 import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches, refangIoc, removeArrayDuplicates, validateDomain } from "./textUtils";
 import { openDetails, removeElements } from "./domUtils";
+import { apiRequest, appendResult } from "./api";
+import { VT_DOMAIN, VtResponse } from "./vt";
 
 export const VIEW_TYPE = "plugin-sidebar";
 
@@ -158,8 +160,20 @@ export class PluginSidebar extends ItemView {
             .setButtonText(text)
             .setClass('sidebar-button')
             .onClick(() => {
-                open(link)
+                open(link);
             })
+    }
+
+    addApiButton(parentEl: HTMLElement, text: string, indicator: string) {
+        new ButtonComponent(parentEl)
+            .setButtonText(text)
+            .setClass('sidebar-button')
+            .onClick(async () => {
+                const file = this.app.workspace.getActiveFile();
+                if (!file) return;
+                const data = apiRequest(VT_DOMAIN, indicator, "") as Promise<VtResponse>;
+                appendResult(data, this.app, file);
+            });
     }
 
     addIndicatorEl(parentEl: HTMLElement, indicator: string, indicatorType?: string): void {
@@ -179,6 +193,7 @@ export class PluginSidebar extends ItemView {
                 case 'domain': {
                     if (search.domain) {
                         this.addButton(buttonEl.createEl("td", {cls: this.tdClass}), search.shortName, search.site.replace('%s', indicator));
+                        this.addApiButton(buttonEl.createEl("td", {cls: this.tdClass}), `${search.shortName} API`, indicator)
                     }
                     break;
                 }

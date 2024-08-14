@@ -17,11 +17,12 @@ function transformSelectedText(editor: Editor, func: Function) {
 function appendToEnd(app: App, file: TFile, text: string) {
     if (!app) return;
     const vault = app.vault;
+    if (!vault || !file) return;
+    vault.append(file, `\n${text}`);
     const view = app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
     const editor = view.editor;
-    if (!editor || !vault || !file) return;
-    vault.append(file, `\n${text}`);
+    if (!editor) return;
     let lastLine = editor.lastLine();
     if (!lastLine) return;
     lastLine = lastLine - 1;

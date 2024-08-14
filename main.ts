@@ -15,7 +15,12 @@ import {
 	getValidTld,
 	virusTotal,
 	VT_DOMAIN,
-	removeElements
+	removeElements,
+	HASH_REGEX,
+	VT_HASH,
+	appendToEnd,
+	DOMAIN_REGEX,
+	VtDomainAttributes
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
@@ -127,7 +132,32 @@ export default class MyPlugin extends Plugin {
 					}
 				})
 			})
-		})
+		});
+		this.transformRef = this.app.workspace.on("editor-menu", (menu) => {
+			menu.addItem((item) => {
+				item.setTitle('Search VirusTotal')
+				.onClick(async () => {
+					const editor = this.app.workspace.activeEditor?.editor;
+					const file = this.app.workspace.getActiveFile();
+					if (editor && file) {
+						const selection = editor.getSelection();
+						if (HASH_REGEX.test(selection)) {
+							console.log('appending');
+							const data = await virusTotal(VT_HASH, selection, this.settings.vtApiKey);
+							appendToEnd(this.app, file, `\`\`\`ApiResult\n${data}\n\`\`\``);
+						}
+						if (DOMAIN_REGEX.test(selection)) {
+							console.log('appending');
+							const data = await virusTotal(VT_DOMAIN, selection, this.settings.vtApiKey);
+							const attributes = data.attributes as VtDomainAttributes;
+							console.log(data);
+							console.log(attributes.last_analysis_stats);
+							appendToEnd(this.app, file, `\`\`\`ApiResult\n${selection}\n${JSON.stringify(attributes.last_analysis_stats, null, 2)}\n\`\`\``);
+						}
+					}
+				})
+			})
+		});
 	}
 
 	async activateView() {

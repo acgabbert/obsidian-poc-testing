@@ -1,13 +1,7 @@
 import { request, RequestUrlParam } from "obsidian";
+import { apiRequest, ApiVals } from "./api";
 
 export { virusTotal };
-
-interface ApiVals {
-    baseUrl: string,
-    iocType: string | string[],
-    queryString?: Record<string, string>,
-    headers?: Record<string, string>
-}
 
 export const VT_IP: ApiVals = {
     baseUrl: "https://www.virustotal.com/api/v3/ip_addresses/",
@@ -31,10 +25,8 @@ export const VT_ENT_SEARCH: ApiVals = {
 }
 
 async function virusTotal(vals: ApiVals, val: string, key: string): Promise<VtResponse> {
-    const headers = {'x-apikey': key};
-    const vtParams = {url: vals.baseUrl + val, headers: headers, throw: true} as RequestUrlParam;
-    const data = await request(vtParams);
-    return JSON.parse(data).data as VtResponse;
+    const resp = await apiRequest(vals, val, key) as VtResponse;
+    return resp;
 }
 
 export type VtResponse = {
