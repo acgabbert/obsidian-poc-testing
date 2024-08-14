@@ -6,6 +6,7 @@ export {
     convertTime,
     defangIp,
     defangDomain,
+    defangEmail,
     extractMacros,
     extractMatches,
     findFirstByRegex,
@@ -101,6 +102,16 @@ function defangDomain(text: string): string {
     const anyDomain = /(([\w-]\.?)+)\.((xn--)?([a-z][a-z0-9\-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/gi;
     let retval = text.replaceAll(httpString, "hxxp$1[://]");
     retval = retval.replaceAll(anyDomain, "$1[.]$3");
+    return retval;
+}
+
+function defangEmail(text: string): string {
+    /**
+     * Defangs email addresses
+     * @returns input string with email addresses defanged
+     */
+    const emailString = /([^\s]+[^\s]+)@()\.([^\s]+)/gi;
+    let retval = text.replaceAll(emailString, "$1[@]$2[.]$3");
     return retval;
 }
 
