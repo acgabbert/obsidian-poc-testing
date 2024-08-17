@@ -6,10 +6,10 @@ import { datePickerSettingEl } from "./domUtils";
 export { CodeListModal, CodeModal, ErrorModal, InputModal };
 
 export const supportedMacros = new Map<RegExp, RegExp[]>();
-supportedMacros.set(/user(name)?/gi, new Array(constructMacroRegex(/user(?:\s*named?)?/))); // username
-supportedMacros.set(/(host|computer|comp)(name)?/gi, new Array(constructMacroRegex(/(?:host|computer|comp)\s*(?:named?)?/))); // hostname/computername
+supportedMacros.set(/user(name)?/gi, new Array(constructMacroRegex(/user\.?(?:\s*named?)?/))); // username
+supportedMacros.set(/(host|computer|comp)(name)?/gi, new Array(constructMacroRegex(/(?:host|computer|comp)\.?\s*(?:named?)?/))); // hostname/computername
 supportedMacros.set(/(hash|sha256|sha)/gi, new Array(constructMacroRegex(/(?:hash|sha\s*256|sha)/))); // hash
-supportedMacros.set(/(file(path)?|path)(name)?/gi, new Array(FILE_REGEX, constructMacroRegex(/(?:(?:file\s*(?:path)?|path)\s*(?:name)?)/))); // file
+supportedMacros.set(/(file(path)?|path)(name)?/gi, new Array(FILE_REGEX, constructMacroRegex(/(?:(?:file\s*(?:path)?|path|attachments?)\.?\s*(?:name)?)/))); // file
 
 export interface Code {
     content: string,
