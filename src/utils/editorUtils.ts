@@ -9,7 +9,7 @@ function transformSelectedText(editor: Editor, func: Function) {
      * @returns the transformed text
      */
     const selection = editor.getSelection();
-    let transformed = func(selection);
+    const transformed = func(selection);
     editor.replaceSelection(transformed);
     return transformed;
 }
@@ -26,7 +26,7 @@ function appendToEnd(app: App, file: TFile, text: string) {
     let lastLine = editor.lastLine();
     if (!lastLine) return;
     lastLine = lastLine - 1;
-    let lastLineLen = editor.getLine(lastLine).length;
+    const lastLineLen = editor.getLine(lastLine).length;
     if (!lastLineLen) return;
     const lastLinePos = {line: lastLine, ch: lastLineLen} as EditorPosition;
     editor.setCursor(lastLinePos);

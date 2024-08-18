@@ -193,7 +193,7 @@ function replaceTemplateText(template: string, content: string, note: TFile, con
     return template_replaced;
 }
 
-export const MACRO_REGEX = /(\{\{([^\}]+)\}\})/g;
+export const MACRO_REGEX = /({{([^}]+)}})/g;
 function extractMacros(text: string): string[] {
     /**
      * Extract macros in the format {{macro}}
@@ -213,7 +213,7 @@ function extractMatches(text: string, pattern: RegExp | RegExp[]): string[] {
      * @returns an array of strings that matched the given regex
      */
     if (Array.isArray(pattern)) {
-        const matches = new Array();
+        const matches: string[] = [];
         pattern.forEach((value) => {
             addUniqueValuesToArray(matches, text.matchAll(value));
         });

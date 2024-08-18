@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
     codeFile: '',
 	vtApiKey: '',
 	ipdbApiKey: '',
-	validTld: new Array(),
+	validTld: [],
 	searchSites: defaultSites
 }
 

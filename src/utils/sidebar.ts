@@ -123,7 +123,7 @@ export class PluginSidebar extends ItemView {
         this.ipEl = this.addContainer(container, "IPs");
         this.domainEl = this.addContainer(container, "Domains");
         this.hashEl = this.addContainer(container, "Hashes");
-        let containers = document.getElementsByClassName(this.sidebarContainerClass);
+        const containers = document.getElementsByClassName(this.sidebarContainerClass);
         openDetails(containers as HTMLCollectionOf<HTMLDetailsElement>);
         const file = this.app.workspace.getActiveFile();
         if (file) await this.updateView(file);
@@ -275,7 +275,7 @@ export class PluginSidebar extends ItemView {
                     if (!indicatorMultisearch.has(site.shortName)) {
                         indicatorMultisearch.set(site.shortName, site.site.replace('%s', indicator));
                     } else {
-                        let url = indicatorMultisearch.get(site.shortName);
+                        const url = indicatorMultisearch.get(site.shortName);
                         if (!url) {
                             indicatorMultisearch.set(site.shortName, site.site.replace('%s', indicator));
                         } else if (!url.includes(indicator)) {

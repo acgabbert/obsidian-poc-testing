@@ -6,10 +6,10 @@ import { datePickerSettingEl } from "./domUtils";
 export { CodeListModal, CodeModal, ErrorModal, InputModal };
 
 export const supportedMacros = new Map<RegExp, RegExp[]>();
-supportedMacros.set(/user(name)?/gi, new Array(constructMacroRegex(/user\.?(?:\s*named?)?/))); // username
-supportedMacros.set(/(host|computer|comp)(name)?/gi, new Array(constructMacroRegex(/(?:host|computer|comp)\.?\s*(?:named?)?/))); // hostname/computername
-supportedMacros.set(/(hash|sha256|sha)/gi, new Array(constructMacroRegex(/(?:hash|sha\s*256|sha)/))); // hash
-supportedMacros.set(/(file(path)?|path)(name)?/gi, new Array(FILE_REGEX, constructMacroRegex(/(?:(?:file\s*(?:path)?|path|attachments?)\.?\s*(?:name)?)/))); // file
+supportedMacros.set(/user(name)?/gi, [constructMacroRegex(/user\.?(?:\s*named?)?/)]); // username
+supportedMacros.set(/(host|computer|comp)(name)?/gi, [constructMacroRegex(/(?:host|computer|comp)\.?\s*(?:named?)?/)]); // hostname/computername
+supportedMacros.set(/(hash|sha256|sha)/gi, [constructMacroRegex(/(?:hash|sha\s*256|sha)/)]); // hash
+supportedMacros.set(/(file(path)?|path)(name)?/gi, [FILE_REGEX, constructMacroRegex(/(?:(?:file\s*(?:path)?|path|attachments?)\.?\s*(?:name)?)/)]); // file
 
 export interface Code {
     content: string,
@@ -68,8 +68,11 @@ class CodeListModal extends SuggestModal<string> {
 
     renderSuggestion(value: string, el: HTMLElement) {
         const lineRegex = /([^\n]*\n?){0,4}/g;
-        const item = this.content.get(value)!;
-        const clippedItem = lineRegex.exec(item.content)![0];
+        const item = this.content.get(value);
+        if (!item) return;
+        const itemArray = lineRegex.exec(item.content);
+        if (!itemArray) return;
+        const clippedItem = itemArray[0];
         //el.createEl("span") icon
         el.createEl("span", {text: value, cls: "code__suggestion_title"});
         el.createEl("span", {text: item.lang, cls: "code__language"});
@@ -80,7 +83,7 @@ class CodeListModal extends SuggestModal<string> {
     }
     
     onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
-        let result = this.content.get(item)!.content;
+        const result = this.content.get(item)!.content;
         const selectedCode = new ScriptObject(this.content.get(item)!, true)
         const extractedMacros = extractMacros(result);
         if (extractedMacros.length > 0) {
@@ -114,7 +117,7 @@ class InputModal extends Modal {
     
     addMacros(activeNote: string | null, contentEl: HTMLElement) {
     	this.content.macros.forEach((contentMacro) => {
-            let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
+            const regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
             const regexResults = regexTest.exec(contentMacro);
             let displayMacro = contentMacro;
             if (regexResults) {
@@ -178,7 +181,7 @@ class InputModal extends Modal {
 
     async onOpen(): Promise<void> {
         const {contentEl} = this;
-        let activeNote = await getActiveNoteContent(this.app);
+        const activeNote = await getActiveNoteContent(this.app);
         contentEl.createEl("h1", {text: "Input Parameters:"});
         this.addMacros(activeNote, contentEl);
         this.addDatePicker(contentEl);
