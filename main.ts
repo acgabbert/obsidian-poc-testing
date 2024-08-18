@@ -1,4 +1,4 @@
-import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf, request, RequestUrlParam } from 'obsidian';
+import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
 import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
 import {
@@ -43,7 +43,7 @@ export default class MyPlugin extends Plugin {
 		} catch(e) {
 			console.log(e);
 		}
-		let tlds = await getValidTld();
+		const tlds = await getValidTld();
 		if (tlds) this.settings.validTld = tlds;
 		await this.saveSettings();
 		// This creates an icon in the left ribbon.
@@ -93,7 +93,7 @@ export default class MyPlugin extends Plugin {
 				console.log(editor.lastLine());
 				const selection = editor.getSelection();
 				console.log(`got ${selection}`);
-				let replaced = defangDomain(selection);
+				const replaced = defangDomain(selection);
 				console.log(`replacing ${replaced}`);
 				editor.replaceSelection(replaced);
 			}
@@ -127,7 +127,7 @@ export default class MyPlugin extends Plugin {
 					const editor = this.app.workspace.activeEditor?.editor;
 					if (editor) {
 						const selection = editor.getSelection();
-						let replaced = defangDomain(selection);
+						const replaced = defangDomain(selection);
 						editor.replaceSelection(replaced);
 					}
 				})

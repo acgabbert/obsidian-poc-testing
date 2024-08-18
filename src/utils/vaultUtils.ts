@@ -83,7 +83,7 @@ async function createNote(vault: Vault, folderName: string, noteTitle: string): 
     return await vault.create(`${folderName}/${noteTitle}.md`, '');
 }
 
-function getBacklinks(notePath: string, app: App, resolved: boolean = false): Array<string> {
+function getBacklinks(notePath: string, app: App, resolved = false): Array<string> {
     /**
      * Get an array of the unresolved backlinks in a note.
      * @param notePath the note to check
@@ -97,7 +97,7 @@ function getBacklinks(notePath: string, app: App, resolved: boolean = false): Ar
     } else {
         backlinks = app.metadataCache.unresolvedLinks[notePath];
     }
-    let retval = []
+    const retval = []
     for (const i in backlinks) {
         retval.push(i);
     }

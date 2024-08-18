@@ -1,5 +1,5 @@
-import { App, RequestUrlParam, TFile, request } from "obsidian";
-import { Code, InputModal } from "./modal";
+import { RequestUrlParam, TFile, request } from "obsidian";
+import { Code } from "./modal";
 export {
     addUniqueValuesToArray,
     constructMacroRegex,
@@ -28,7 +28,7 @@ export {
 export const IP_REGEX = /(\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3}\[?\.\]?\d{1,3})/gi;
 export const DOMAIN_REGEX = /((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.|\[\.\]))+[a-zA-Z][a-zA-Z0-9-]{0,61}[a-zA-Z](?=\.?)\b)/gi;
 export const HASH_REGEX = /(?:^|[^a-fA-F0-9]*)([a-fA-F0-9]{64}|[a-fA-F0-9]{40}|[a-fA-F0-9]{32})/gi;
-export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\\/])[^\\\/]+[\\\/]([^\\\/\n"|]+[\\\/]?)+(\.\w+)?)/gi;
+export const FILE_REGEX = /(?:^|\s|")((\w:\\|[\\/])[^\\/]+[\\/]([^\\/\n"|]+[\\/]?)+(\.\w+)?)/gi;
 
 export const TLD_URL = 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt';
 
@@ -99,7 +99,7 @@ function defangDomain(text: string): string {
      * @returns input string with domains defanged
      */
     const httpString = /http(s?):\/\//gi;
-    const anyDomain = /(([\w-]\.?)+)\.((xn--)?([a-z][a-z0-9\-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/gi;
+    const anyDomain = /(([\w-]\.?)+)\.((xn--)?([a-z][a-z0-9-]{1,60}|[a-z][a-z0-9-]{1,29}\.[a-z]{2,}))/gi;
     let retval = text.replaceAll(httpString, "hxxp$1[://]");
     retval = retval.replaceAll(anyDomain, "$1[.]$3");
     return retval;
@@ -111,7 +111,7 @@ function defangEmail(text: string): string {
      * @returns input string with email addresses defanged
      */
     const emailString = /([^\s]+)@([^\s]+)\.([^\s]+)/gi;
-    let retval = text.replaceAll(emailString, "$1[@]$2[.]$3");
+    const retval = text.replaceAll(emailString, "$1[@]$2[.]$3");
     return retval;
 }
 
@@ -172,7 +172,7 @@ function findFirstByRegex(text: string, regex: RegExp): string {
     }
 }
 
-function replaceTemplateText(template: string, content: string, note: TFile, contentMacro: string = "{{content}}") {
+function replaceTemplateText(template: string, content: string, note: TFile, contentMacro = "{{content}}") {
     /**
      * Put a template around the given content.
      * Supported macros: 
@@ -200,7 +200,7 @@ function extractMacros(text: string): string[] {
      * @param text
      * @returns a unique list of macros in the text
      */
-    let regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
+    const regexTest = new RegExp(MACRO_REGEX.source, MACRO_REGEX.flags);
     const matches = text.matchAll(regexTest);
     return addUniqueValuesToArray([], matches);
 }
@@ -290,7 +290,7 @@ function validateDomain(domain: string, validTld: string[]): boolean {
     return false;
 }
 
-function removeArrayDuplicates(array: any[]): any[] {
+function removeArrayDuplicates(array: string[]): string[] {
     /**
      * removes duplicates from the passed array.
      * @param array 

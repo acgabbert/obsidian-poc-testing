@@ -1,4 +1,3 @@
-import { request, RequestUrlParam } from "obsidian";
 import { apiRequest, ApiVals } from "./api";
 
 export { virusTotal };
@@ -79,7 +78,7 @@ export interface VtDomainAttributes extends VtAttributes {
     whois: string
     popularity_ranks: Record<string, VtDomainPopularity>
     last_dns_records_date: number
-    last_https_certificate: Record<string, Object>
+    last_https_certificate: Record<string, unknown>
     creation_date: number
 }
 
