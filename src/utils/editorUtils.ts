@@ -15,6 +15,12 @@ function transformSelectedText(editor: Editor, func: Function) {
 }
 
 function appendToEnd(app: App, file: TFile, text: string) {
+    /**
+     * Append content to the end of a file, and scroll to view it.
+     * @param app the current Obsidian App instance
+     * @param file the current note
+     * @param text the text to be appended
+     */
     if (!app) return;
     const vault = app.vault;
     if (!vault || !file) return;

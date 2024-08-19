@@ -277,14 +277,27 @@ function parseCodeBlocks(content: string): Map<string, Code> {
 }
 
 export const macroSeparator = "(?:\\s*[:=]\\s*|\\s+)";
-export const macroValue = "(((?:[^\\}\\s]*\\w[^\\}\\s]*)+))";
+export const macroValue = "(((?:[^}\\s]*\\w[^}\\s]*)+))";
 function constructMacroRegex(macroRegex: string | RegExp): RegExp {
+    /**
+     * Constructs a regular expression to match values in the note based on the passed values
+     * and separator constants above
+     * @param macroRegex the macro name (like file, user, etc)
+     * @returns the constructed regular expression
+     */
     if (macroRegex instanceof RegExp) macroRegex = macroRegex.source;
     const retval = new RegExp(macroRegex + macroSeparator + macroValue, "gi");
+    console.log(retval);
     return retval;
 }
 
 function validateDomain(domain: string, validTld: string[]): boolean {
+    /**
+     * Validate a domain against a list of valid top-level domains (TLD)
+     * @param domain the domain to validate
+     * @validTld an array of valid TLD strings
+     * @returns the boolean representation of the domain's validity
+     */
     const tld = domain.split('.').pop()?.toUpperCase();
     if (tld && validTld.includes(tld)) return true;
     return false;
@@ -303,8 +316,4 @@ function removeArrayDuplicates(array: string[]): string[] {
 
 function convertTime(timeString: string): number {
     return Date.parse(timeString);
-}
-
-function formatInputTime(date: number): string {
-    return "";
 }
