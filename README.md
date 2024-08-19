@@ -4,6 +4,9 @@ This is a testing plugin for Obsidian (https://obsidian.md).
 
 The code was derived from the Obsidian Sample Plugin (https://github.com/obsidianmd/obsidian-sample-plugin).
 
+I'm using this project to mess around with different features of the Obsidian TypeScript API, as well as to
+develop utility functions for use in other plugins.
+
 ## How to use
 
 - Clone this repo.
