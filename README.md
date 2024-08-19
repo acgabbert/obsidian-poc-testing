@@ -7,6 +7,8 @@ The code was derived from the Obsidian Sample Plugin (https://github.com/obsidia
 I'm using this project to mess around with different features of the Obsidian TypeScript API, as well as to
 develop utility functions for use in other plugins.
 
+You can find the utility functions in [`src/utils`](src/utils/)
+
 ## How to use
 
 - Clone this repo.
