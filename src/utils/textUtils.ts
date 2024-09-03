@@ -63,7 +63,14 @@ function localDateTime() {
     return `${todayLocalDate()} ${new Date(Date.now()).toString().slice(16, 21)}`
 }
 
-function todayFolderStructure(quarter: boolean): Array<string> {
+export interface folderPrefs {
+    year: boolean,
+    month: boolean,
+    quarter: boolean,
+    day: boolean
+}
+
+function todayFolderStructure(prefs: folderPrefs): Array<string> {
     /**
      * Returns a string with the folder structure for the current date
      * Format: `YYYY/YYYY-QQ/YYYY-MM/YYYY-MM-DD`
@@ -76,10 +83,11 @@ function todayFolderStructure(quarter: boolean): Array<string> {
     const month = Number(date.slice(5,7));
     const yearMonth = date.slice(0,7);
     const currentQuarter = Math.floor((month + 2) / 3);
-    const folderArray = [year, yearMonth, date]
-    if (quarter) {
-        folderArray.splice(1, 0, `${year}-Q${currentQuarter}`)
-    }
+    const folderArray = [];
+    if (prefs.year) folderArray.push(year);
+    if (prefs.quarter) folderArray.push(`${year}-Q${currentQuarter}`);
+    if (prefs.month) folderArray.push(yearMonth);
+    if (prefs.day) folderArray.push(date);
     const folders = folderArray.join('/');
     return folderArray;
 }

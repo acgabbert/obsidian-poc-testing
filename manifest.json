@@ -2,7 +2,7 @@
 	"id": "obsidian-poc-testing",
 	"name": "My Proof of Concept Testing Plugin",
 	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
+	"minAppVersion": "1.6.6",
 	"description": "Messing around with some of the capabilities of the Obsidian API.",
 	"author": "acgabbert",
 	"authorUrl": "https://github.com/acgabbert",

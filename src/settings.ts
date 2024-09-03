@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 import MyPlugin from "main";
-import { defaultSites, removeDotObsidian, searchSite } from "./utils";
+import { defaultSites, folderPrefs, removeDotObsidian, searchSite } from "./utils";
 
 export { DEFAULT_SETTINGS, MySettingTab };
 export type { MyPluginSettings };
@@ -14,6 +14,7 @@ interface MyPluginSettings {
 	ipdbApiKey: string;
 	validTld: string[];
 	searchSites: searchSite[];
+	folder: folderPrefs;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -23,7 +24,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	vtApiKey: '',
 	ipdbApiKey: '',
 	validTld: [],
-	searchSites: defaultSites
+	searchSites: defaultSites,
+	folder: {year: true, quarter: true, month: true, day: true}
 }
 
 class MySettingTab extends PluginSettingTab {
@@ -39,6 +41,7 @@ class MySettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 		const vault = this.app.vault;
+		const folders = vault.getAllFolders();
 		const subFolders = (await vault.adapter.list('')).folders;
         let topLevelFiles = (await vault.adapter.list('')).files;
         topLevelFiles = removeDotObsidian(topLevelFiles);
@@ -48,9 +51,9 @@ class MySettingTab extends PluginSettingTab {
 			.setName('Root folder dropdown')
 			.setDesc('The folder to start searching from')
 			.addDropdown( (dropdown) => {
-				for (const subFolder in subFolders) {
-					dropdown.addOption(subFolder, subFolder);
-				}
+				folders.forEach((folder) => {
+					dropdown.addOption(folder.path, folder.path);
+				})
 				dropdown.onChange(async (value) => {
 					this.plugin.settings.rootFolderDropdown = value;
 					await this.plugin.saveSettings();
