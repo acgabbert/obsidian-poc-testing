@@ -50,7 +50,7 @@ export default class MyPlugin extends Plugin {
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			//new Notice(data['bio']);
-			const folderArray = todayFolderStructure(true);
+			const folderArray = todayFolderStructure(this.settings.folder);
 			for (let i = 1; i <= folderArray.length; i++) {
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
 			}
@@ -58,7 +58,7 @@ export default class MyPlugin extends Plugin {
 		// This creates an icon in the left ribbon.
 		const addNoteIcon = this.addRibbonIcon('file-plus-2', 'Create note from clipboard', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			const folderArray = todayFolderStructure(true);
+			const folderArray = todayFolderStructure(this.settings.folder);
 			for (let i = 1; i <= folderArray.length; i++) {
 				createFolderIfNotExists(vault, `/${this.settings.rootFolder}/${folderArray.slice(0,i).join('/')}`)
 			}
