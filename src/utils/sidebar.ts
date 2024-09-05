@@ -82,6 +82,8 @@ export class PluginSidebar extends ItemView {
     hashRegex: RegExp;
     domainRegex: RegExp;
 
+    previousContent: string;
+
     sidebarContainerClass = "sidebar-container tree-item";
     listClass = "sidebar-list-item";
     listItemClass = this.listClass + " tree-item-self";
@@ -127,6 +129,15 @@ export class PluginSidebar extends ItemView {
         openDetails(containers as HTMLCollectionOf<HTMLDetailsElement>);
         const file = this.app.workspace.getActiveFile();
         if (file) await this.updateView(file);
+    }
+
+    incrementalChange() {
+        const content = this.app.workspace.activeEditor?.editor?.getValue();
+        if (!content) return;
+        if (!this.previousContent) {
+            this.previousContent = content;
+            return content;
+        }
     }
 
     addContainer(el: Element, text: string) {
@@ -294,6 +305,7 @@ export class PluginSidebar extends ItemView {
     }
 
     async updateView(file: TFile) {
+        this.incrementalChange();
         await this.getMatches(file);
         const container = this.containerEl.children[1];
         this.clearSidebar(container);
