@@ -6,6 +6,19 @@ export const AppContext = createContext<App | undefined>(undefined);
 
 //export function IocList({})
 
+type IocListProps = {
+    title: string;
+    indicators: string[];
+}
+
+export const IocList: React.FC<IocListProps> = ({title, indicators}) => {
+    const indicatorList = indicators.map((item) => <div>{item}</div>)
+    return <details>
+        <summary>{title}</summary>
+        <div>{indicatorList}</div>
+    </details>
+}
+/*
 export function IocList({title, indicators}) {
     const indicatorList = indicators.map((item) => <div>{item}</div>)
     return <details>
@@ -13,7 +26,7 @@ export function IocList({title, indicators}) {
         <div>{indicatorList}</div>
     </details>
 }
-
+*/
 export default function Sidebar() {
     return (
         <>
