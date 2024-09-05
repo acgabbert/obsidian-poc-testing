@@ -98,7 +98,6 @@ export class PluginSidebar extends ItemView {
         this.ipRegex = IP_REGEX;
         this.hashRegex = HASH_REGEX;
         this.domainRegex = DOMAIN_REGEX;
-        if (validTld) this.validTld = validTld;
         if (searchSites) this.searchSites = searchSites;
         this.ipExclusions = IP_EXCLUSIONS;
         this.domainExclusions = DOMAIN_EXCLUSIONS;
