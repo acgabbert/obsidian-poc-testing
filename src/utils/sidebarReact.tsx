@@ -1,10 +1,11 @@
-import { createContext } from "react";
+import { createContext, useEffect, useState } from "react";
 import { App, ItemView, TFile, WorkspaceLeaf } from "obsidian";
 import { Root, createRoot } from "react-dom/client";
 import { DOMAIN_REGEX, extractMatches, HASH_REGEX, IP_REGEX, refangIoc, removeArrayDuplicates, validateDomain } from "./textUtils";
 import { defaultSites, ipdbSearch, searchSite } from "./sidebar";
 
 export const AppContext = createContext<App | undefined>(undefined);
+export const REACTIVE_VIEW_TYPE = 'Reactive Sidebar';
 
 type ButtonProps = {
     search: searchSite[];
@@ -14,6 +15,10 @@ type ButtonProps = {
 type IocListProps = {
     title: string;
     indicators: string[];
+}
+
+type SidebarProps = {
+    app: App;
 }
 
 export class ReactiveSidebar extends ItemView {
@@ -37,19 +42,20 @@ export class ReactiveSidebar extends ItemView {
 
     constructor(leaf: WorkspaceLeaf, searchSites?: searchSite[], validTld?: string[]) {
         super(leaf)
-        this.registerActiveFileListener();
-        this.registerOpenFile();
         if (searchSites) this.searchSites = searchSites;
         else this.searchSites = defaultSites;
         if (validTld) this.validTld = validTld;
+        this.ips = [];
+        this.domains = [];
+        this.hashes = [];
     }
 
     getViewType(): string {
-        return 'Reactive Sidebar';
+        return REACTIVE_VIEW_TYPE;
     }
 
     getDisplayText(): string {
-        return 'Reactive Sidebar';
+        return REACTIVE_VIEW_TYPE;
     }
     
     Buttons: React.FC<ButtonProps> = ({search, indicator}) => {
@@ -88,10 +94,49 @@ export class ReactiveSidebar extends ItemView {
         </details>
     }
 
-    Sidebar() {
-        const ipList = ['8.8.8.8', '9.9.9.9'];
-        const domainList = ['facebook.com', 'google.com'];
-        const hashList = ['6F26C1696C909282D86B1A4F2CD8B41D5F6F30C9DAE5D316035F657D461C7E07'];
+    Sidebar: React.FC<SidebarProps> = ({app}) => {
+        const [ips, setIps] = useState<string[]>([]);
+        const [domains, setDomains] = useState<string[]>([]);
+        const [hashes, setHashes] = useState<string[]>([]);
+
+        const getMatches = async (file: TFile) => {
+            const fileContent = await this.app.vault.cachedRead(file);
+            const newIps = extractMatches(fileContent, IP_REGEX);
+            const newDomains = extractMatches(fileContent, DOMAIN_REGEX);
+            const newHashes = extractMatches(fileContent, HASH_REGEX);
+            this.refangIocs();
+            this.validateDomains();
+            setIps(newIps);
+            setDomains(newDomains);
+            setHashes(newHashes);
+            //this.processExclusions();
+        }
+
+        useEffect(() => {
+            const activeFile = app.workspace.getActiveFile();
+            if (activeFile) {
+                getMatches(activeFile);
+            }
+            // Register listeners for file modifications and opening
+            const modifyListener = app.vault.on('modify', async (file: TFile) => {
+                if (file === app.workspace.getActiveFile()) {
+                    await getMatches(file);
+                }
+            });
+
+            const openFileListener = app.workspace.on('file-open', async (file: TFile) => {
+                if (file === app.workspace.getActiveFile()) {
+                    await getMatches(file);
+                }
+            });
+
+            // Cleanup listeners on component unmount
+            return () => {
+                app.vault.offref(modifyListener);
+                app.workspace.offref(openFileListener);
+            };
+        }, []);
+
         return (
             <>
                 <this.IocList title="IPs" indicators={this.ips}/>
@@ -104,8 +149,8 @@ export class ReactiveSidebar extends ItemView {
     protected async onOpen(): Promise<void> {
         this.root = createRoot(this.containerEl.children[1]);
         const file = this.app.workspace.getActiveFile();
-        if (file) await this.getMatches(file);
-        this.root.render(this.Sidebar());
+        //if (file) await this.getMatches(file);
+        this.root.render(this.Sidebar(this.app));
     }
 
     protected async onClose(): Promise<void> {
@@ -131,37 +176,5 @@ export class ReactiveSidebar extends ItemView {
                 index -= 1;
             }
         }
-    }
-
-    async getMatches(file: TFile) {
-        const fileContent = await this.app.vault.cachedRead(file);
-        this.ips = extractMatches(fileContent, this.ipRegex);
-        console.log(this.ips);
-        this.domains = extractMatches(fileContent, this.domainRegex);
-        this.hashes = extractMatches(fileContent, this.hashRegex);
-        this.refangIocs();
-        this.validateDomains();
-    }
-
-    registerActiveFileListener() {
-        this.registerEvent(
-            this.app.vault.on('modify', async (file: TFile) => {
-                if (file === this.app.workspace.getActiveFile()) {
-                    await this.getMatches(file);
-                    this.root?.render(this.Sidebar());
-                }
-            })
-        );
-    }
-
-    registerOpenFile() {
-        this.registerEvent(
-            this.app.workspace.on('file-open', async (file: TFile) => {
-                if (file === this.app.workspace.getActiveFile()) {
-                    await this.getMatches(file);
-                    this.root?.render(this.Sidebar());
-                }
-            })
-        );
     }
 }

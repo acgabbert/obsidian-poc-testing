@@ -9,10 +9,8 @@ import {
 	createNote,
 	defangDomain,
 	parseCodeBlocks,
-	PluginSidebar,
 	ReactiveSidebar,
 	todayFolderStructure,
-	VIEW_TYPE,
 	getValidTld,
 	virusTotal,
 	VT_DOMAIN,
@@ -21,7 +19,8 @@ import {
 	VT_HASH,
 	appendToEnd,
 	DOMAIN_REGEX,
-	VtDomainAttributes
+	VtDomainAttributes,
+	REACTIVE_VIEW_TYPE
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
@@ -32,7 +31,7 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 		const searchSites = new Map<string, string>();
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
-		this.registerView(VIEW_TYPE, (leaf) => new ReactiveSidebar(leaf));
+		this.registerView(REACTIVE_VIEW_TYPE, (leaf) => new ReactiveSidebar(leaf));
 		this.addRibbonIcon("cat", "Activate view", () => {
 			this.activateView();
 		});
@@ -164,12 +163,12 @@ export default class MyPlugin extends Plugin {
 	async activateView() {
 		const {workspace} = this.app;
 		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(VIEW_TYPE);
+		const leaves = workspace.getLeavesOfType(REACTIVE_VIEW_TYPE);
 		if (leaves.length > 0) {
 			leaf = leaves[0];
 		} else {
 			leaf = workspace.getRightLeaf(false);
-			await leaf?.setViewState({type: VIEW_TYPE});
+			await leaf?.setViewState({type: REACTIVE_VIEW_TYPE});
 		}
 		if (!leaf) return;
 		workspace.revealLeaf(leaf);
