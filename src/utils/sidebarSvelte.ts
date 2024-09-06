@@ -1,10 +1,13 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
-import Sidebar from "../components/Sidebar.svelte"
+import { ItemView, Plugin, WorkspaceLeaf } from "obsidian";
+import Sidebar from "src/components/Sidebar.svelte";
+import IocList from "src/components/IocList.svelte";
 
 export const SVELTE_VIEW_TYPE = "Svelte-Sidebar";
 
 export class SvelteSidebar extends ItemView {
-    sidebar: Sidebar;
+    sidebar: Sidebar | undefined;
+    iocList: IocList | undefined;
+    title: string | undefined;
     
     constructor(leaf: WorkspaceLeaf) {
         super(leaf);
@@ -19,15 +22,16 @@ export class SvelteSidebar extends ItemView {
     }
 
     protected async onOpen(): Promise<void> {
-        this.sidebar = new Sidebar({
+        this.iocList = new IocList({
             target: this.contentEl,
             props: {
-                variable: 1
+                title: "IPs",
+                iocList: ['8.8.8.8', '9.9.9.9']
             }
-        })
+        });
     }
 
     async onClose() {
-      this.sidebar.$destroy();
+      this.iocList?.$destroy();
     }
 }

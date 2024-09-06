@@ -2,7 +2,7 @@ import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
 import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches, refangIoc, removeArrayDuplicates, validateDomain } from "./textUtils";
 import { openDetails, removeElements } from "./domUtils";
 import { apiRequest, appendResult } from "./api";
-import { VT_DOMAIN, VtResponse } from "./vt";
+import { VT_DOMAIN, type VtResponse } from "./vt";
 
 export const VIEW_TYPE = "plugin-sidebar";
 
@@ -62,21 +62,21 @@ export const DOMAIN_EXCLUSIONS = ["google.com"]
 export const defaultSites: searchSite[] = [vtSearch, ipdbSearch, googleSearch];
 
 export class PluginSidebar extends ItemView {
-    ips: string[];
+    ips: string[] | undefined;
     ipExclusions: string[];
     ipMultisearch: Map<string, string>;
-    domains: string[];
+    domains: string[] | undefined;
     domainExclusions: string[];
     domainMultisearch: Map<string, string>;
-    hashes: string[];
+    hashes: string[] | undefined;
     hashExclusions: string[]
     hashMultisearch: Map<string, string>;
-    ipEl: HTMLDivElement;
-    domainEl: HTMLDivElement;
-    hashEl: HTMLDivElement;
+    ipEl: HTMLDivElement | undefined;
+    domainEl: HTMLDivElement | undefined;
+    hashEl: HTMLDivElement | undefined;
     searchSites: searchSite[];
     sidebarTitle: string;
-    validTld: string[];
+    validTld: string[] | undefined;
 
     ipRegex: RegExp;
     hashRegex: RegExp;

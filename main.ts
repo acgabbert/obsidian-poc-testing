@@ -23,6 +23,7 @@ import {
 	DOMAIN_REGEX,
 	VtDomainAttributes
 } from 'src/utils';
+import store from 'src/components/store';
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
