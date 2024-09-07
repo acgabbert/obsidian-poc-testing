@@ -47,7 +47,7 @@ export class SvelteSidebar extends ItemView {
     registerOpenFile() {
         this.registerEvent(
             this.app.workspace.on('file-open', async (file: TFile | null) => {
-                if (file === this.app.workspace.getActiveFile() && file) {
+                if (file && file === this.app.workspace.getActiveFile()) {
                     await this.parseIndicators(file);
                 }
             })
