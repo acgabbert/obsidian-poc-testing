@@ -1,13 +1,11 @@
 <script lang="ts">
-    export let variable: number;
+    import IocList from "./IocList.svelte";
+    //export let iocList: string[];
+    const iocListTitles = ["IPs", "Domains", "Hashes"];
+    const iocs = ["8.8.8.8", "9.9.9.9"];
 </script>
-  
-<div class="number">
-    <span>My number is {variable}!</span>
-</div>
-  
-<style>
-    .number {
-      color: red;
-    }
-</style>
+
+<h4>Extracted Indicators</h4>
+{#each iocListTitles as title}
+    <IocList title={title} iocList={iocs}/>
+{/each}

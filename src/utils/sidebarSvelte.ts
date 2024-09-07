@@ -6,7 +6,6 @@ export const SVELTE_VIEW_TYPE = "Svelte-Sidebar";
 
 export class SvelteSidebar extends ItemView {
     sidebar: Sidebar | undefined;
-    iocList: IocList | undefined;
     title: string | undefined;
     
     constructor(leaf: WorkspaceLeaf) {
@@ -22,16 +21,15 @@ export class SvelteSidebar extends ItemView {
     }
 
     protected async onOpen(): Promise<void> {
-        this.iocList = new IocList({
+        this.sidebar = new Sidebar({
             target: this.contentEl,
             props: {
-                title: "IPs",
-                iocList: ['8.8.8.8', '9.9.9.9']
+                
             }
         });
     }
 
     async onClose() {
-      this.iocList?.$destroy();
+        this.sidebar?.$destroy();
     }
 }
