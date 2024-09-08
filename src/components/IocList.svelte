@@ -16,18 +16,20 @@
             <Item item={item} buttons={indicatorList.sites}/>
         {/each}
     </div>
-    <div class="table-container">
-        <table>
-            <tr class="sidebar-table-row">
-                {#each indicatorList.sites as site}
-                    {#if site.multisearch}
-                        <Button 
-                            href={site.site.replace('%s', indicatorList.items[0])} 
-                            title={`Multisearch ${site.shortName}`}
-                        />
-                    {/if}
-                {/each}
-            </tr>
-        </table>
-    </div>
+    {#if indicatorList.sites}
+        <div class="table-container">
+            <table>
+                <tr class="sidebar-table-row">
+                        {#each indicatorList.sites as site}
+                            {#if site.multisearch}
+                                <Button 
+                                    href={site.site.replace('%s', indicatorList.items[0])} 
+                                    title={`Multisearch ${site.shortName}`}
+                                />
+                            {/if}
+                        {/each}
+                </tr>
+            </table>
+        </div>
+    {/if}
 </details>

@@ -1,6 +1,6 @@
-import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
+import { Editor, type EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
-import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
+import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
 	CodeListModal,
 	addButtonContainer,
@@ -21,19 +21,19 @@ import {
 	VT_HASH,
 	appendToEnd,
 	DOMAIN_REGEX,
-	VtDomainAttributes
+	type VtDomainAttributes
 } from 'src/utils';
-import store from 'src/components/store';
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	private transformRef: EventRef;
+	validTld: string[] | null | undefined;
 
 	async onload() {
 		await this.loadSettings();
 		const searchSites = new Map<string, string>();
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
-		this.registerView(SVELTE_VIEW_TYPE, (leaf) => new SvelteSidebar(leaf));
+		this.registerView(SVELTE_VIEW_TYPE, (leaf) => new SvelteSidebar(leaf, this));
 		this.addRibbonIcon("cat", "Activate view", () => {
 			this.activateView();
 		});
@@ -45,8 +45,9 @@ export default class MyPlugin extends Plugin {
 		} catch(e) {
 			console.log(e);
 		}
-		const tlds = await getValidTld();
-		if (tlds) this.settings.validTld = tlds;
+		this.validTld = await getValidTld();
+		if (this.validTld) this.settings.validTld = this.validTld;
+		else if (this.settings.validTld) this.validTld = this.settings.validTld;
 		await this.saveSettings();
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {

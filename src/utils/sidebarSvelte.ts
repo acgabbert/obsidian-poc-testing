@@ -1,29 +1,32 @@
 import { ItemView, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 import Sidebar from "src/components/Sidebar.svelte";
 import { vtSearch, type searchSite } from "./sidebar";
-import { DOMAIN_REGEX, extractMatches, HASH_REGEX, IP_REGEX } from "./textUtils";
+import { DOMAIN_REGEX, extractMatches, HASH_REGEX, IP_REGEX, refangIoc, removeArrayDuplicates, validateDomain, validateDomains } from "./textUtils";
+import type MyPlugin from "main";
 
 export const SVELTE_VIEW_TYPE = "Svelte-Sidebar";
 
 export interface ParsedIndicators {
     title: string;
     items: string[];
-    sites: searchSite[];
+    sites: searchSite[] | undefined;
 }
 
 export class SvelteSidebar extends ItemView {
     sidebar: Sidebar | undefined;
     iocs: ParsedIndicators[] | undefined;
+    plugin: MyPlugin | undefined;
     
     ipRegex = IP_REGEX;
     hashRegex = HASH_REGEX;
     domainRegex = DOMAIN_REGEX;
     
-    constructor(leaf: WorkspaceLeaf) {
+    constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
         super(leaf);
         this.registerActiveFileListener();
         this.registerOpenFile();
         this.iocs = [];
+        this.plugin = plugin;
     }
 
     getViewType(): string {
@@ -70,31 +73,40 @@ export class SvelteSidebar extends ItemView {
     }
 
     async getMatches(file: TFile) {
-        console.log(`checking matches on ${file.basename}`)
         const fileContent = await this.app.vault.cachedRead(file);
         this.iocs = [];
         const ips: ParsedIndicators = {
             title: "IPs",
             items: extractMatches(fileContent, this.ipRegex),
-            sites: [vtSearch]
+            sites: this.plugin?.settings.searchSites.filter((x) => x.ip)
         }
         const domains: ParsedIndicators = {
             title: "Domains",
             items: extractMatches(fileContent, this.domainRegex),
-            sites: [vtSearch]
+            sites: this.plugin?.settings.searchSites.filter((x) => x.domain)
         }
         const hashes: ParsedIndicators = {
             title: "Hashes",
             items: extractMatches(fileContent, this.hashRegex),
-            sites: [vtSearch]
+            sites: this.plugin?.settings.searchSites.filter((x) => x.hash)
         }
+        if (this.plugin?.validTld) 
+            domains.items = validateDomains(domains.items, this.plugin.validTld);
         this.iocs.push(ips);
         this.iocs.push(domains);
         this.iocs.push(hashes);
-        //this.refangIocs();
-        //this.validateDomains();
+        this.refangIocs();
         //this.processExclusions();
+    }
 
+    private refangIocs() {
+        this.iocs?.forEach((iocList) => {
+            iocList.items.map((x) => {
+                refangIoc(x);
+                x.toLowerCase();
+            });
+            iocList.items = removeArrayDuplicates(iocList.items);
+        })
     }
 
     async parseIndicators(file: TFile) {
