@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 import MyPlugin from "main";
-import { defaultSites, folderPrefs, removeDotObsidian, searchSite } from "./utils";
+import { defaultSites, type folderPrefs, removeDotObsidian, type searchSite } from "./utils";
 
 export { DEFAULT_SETTINGS, MySettingTab };
 export type { MyPluginSettings };
@@ -42,7 +42,6 @@ class MySettingTab extends PluginSettingTab {
 		containerEl.empty();
 		const vault = this.app.vault;
 		const folders = vault.getAllFolders();
-		const subFolders = (await vault.adapter.list('')).folders;
         let topLevelFiles = (await vault.adapter.list('')).files;
         topLevelFiles = removeDotObsidian(topLevelFiles);
 

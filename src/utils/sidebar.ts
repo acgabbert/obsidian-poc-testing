@@ -1,8 +1,8 @@
-import { ButtonComponent, ItemView, TFile, WorkspaceLeaf } from "obsidian";
+import { ButtonComponent, ItemView, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 import { DOMAIN_REGEX, HASH_REGEX, IP_REGEX, extractMatches, refangIoc, removeArrayDuplicates, validateDomain } from "./textUtils";
 import { openDetails, removeElements } from "./domUtils";
 import { apiRequest, appendResult } from "./api";
-import { VT_DOMAIN, VtResponse } from "./vt";
+import { VT_DOMAIN, type VtResponse } from "./vt";
 
 export const VIEW_TYPE = "plugin-sidebar";
 
@@ -62,21 +62,21 @@ export const DOMAIN_EXCLUSIONS = ["google.com"]
 export const defaultSites: searchSite[] = [vtSearch, ipdbSearch, googleSearch];
 
 export class PluginSidebar extends ItemView {
-    ips: string[];
+    ips: string[] | undefined;
     ipExclusions: string[];
     ipMultisearch: Map<string, string>;
-    domains: string[];
+    domains: string[] | undefined;
     domainExclusions: string[];
     domainMultisearch: Map<string, string>;
-    hashes: string[];
+    hashes: string[] | undefined;
     hashExclusions: string[]
     hashMultisearch: Map<string, string>;
-    ipEl: HTMLDivElement;
-    domainEl: HTMLDivElement;
-    hashEl: HTMLDivElement;
+    ipEl: HTMLDivElement | undefined;
+    domainEl: HTMLDivElement | undefined;
+    hashEl: HTMLDivElement | undefined;
     searchSites: searchSite[];
     sidebarTitle: string;
-    validTld: string[];
+    validTld: string[] | undefined;
 
     ipRegex: RegExp;
     hashRegex: RegExp;
@@ -137,8 +137,8 @@ export class PluginSidebar extends ItemView {
 
     registerActiveFileListener() {
         this.registerEvent(
-            this.app.vault.on('modify', async (file: TFile) => {
-                if (file === this.app.workspace.getActiveFile()) {
+            this.app.vault.on('modify', async (file: TAbstractFile) => {
+                if (file === this.app.workspace.getActiveFile() && file instanceof TFile) {
                     await this.updateView(file);
                 }
             })
@@ -147,8 +147,8 @@ export class PluginSidebar extends ItemView {
 
     registerOpenFile() {
         this.registerEvent(
-            this.app.workspace.on('file-open', async (file: TFile) => {
-                if (file === this.app.workspace.getActiveFile()) {
+            this.app.workspace.on('file-open', async (file: TFile | null) => {
+                if (file && file === this.app.workspace.getActiveFile()) {
                     await this.updateView(file);
                 }
             })
@@ -227,25 +227,28 @@ export class PluginSidebar extends ItemView {
     refangIocs() {
         this.ips = this.ips?.map((x) => refangIoc(x));
         this.domains = this.domains?.map((x) => refangIoc(x));
-        this.ips = removeArrayDuplicates(this.ips);
-        this.domains = removeArrayDuplicates(this.domains);
+        if (this.ips) this.ips = removeArrayDuplicates(this.ips);
+        if (this.domains) this.domains = removeArrayDuplicates(this.domains);
         this.hashes = this.hashes?.map((x) => x.toLowerCase());
     }
 
     processExclusions() {
         this.domainExclusions?.forEach((domain) => {
+            if (!this.domains) return;
             if (this.domains.includes(domain)) this.domains.splice(this.domains.indexOf(domain), 1);
         });
         this.ipExclusions?.forEach((ip) => {
+            if (!this.ips) return;
             if (this.ips.includes(ip)) this.ips.splice(this.ips.indexOf(ip), 1);
         });
         this.hashExclusions?.forEach((hash) => {
+            if (!this.hashes) return;
             if (this.hashes.includes(hash)) this.hashes.splice(this.hashes.indexOf(hash), 1);
         });
     }
 
     validateDomains() {
-        if (this.validTld) {
+        if (this.validTld && this.domains) {
             let index = this.domains.length - 1;
             while (index >= 0) {
                 const domain = this.domains[index];
@@ -297,9 +300,9 @@ export class PluginSidebar extends ItemView {
         await this.getMatches(file);
         const container = this.containerEl.children[1];
         this.clearSidebar(container);
-        this.processIndicators(this.ipEl, this.ips, 'ip', this.ipMultisearch);
-        this.processIndicators(this.domainEl, this.domains, 'domain', this.domainMultisearch);
-        this.processIndicators(this.hashEl, this.hashes, 'hash', this.hashMultisearch);
+        if (this.ipEl && this.ips) this.processIndicators(this.ipEl, this.ips, 'ip', this.ipMultisearch);
+        if (this.domainEl && this.domains) this.processIndicators(this.domainEl, this.domains, 'domain', this.domainMultisearch);
+        if (this.hashEl && this.hashes) this.processIndicators(this.hashEl, this.hashes, 'hash', this.hashMultisearch);
     }
 
     protected async onClose(): Promise<void> {

@@ -1,6 +1,6 @@
-import { Editor, EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
+import { Editor, type EventRef, type MarkdownFileInfo, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
-import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from 'src/settings';
+import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
 	CodeListModal,
 	addButtonContainer,
@@ -9,9 +9,9 @@ import {
 	createNote,
 	defangDomain,
 	parseCodeBlocks,
-	PluginSidebar,
+	SVELTE_VIEW_TYPE,
+	SvelteSidebar,
 	todayFolderStructure,
-	VIEW_TYPE,
 	getValidTld,
 	virusTotal,
 	VT_DOMAIN,
@@ -20,18 +20,19 @@ import {
 	VT_HASH,
 	appendToEnd,
 	DOMAIN_REGEX,
-	VtDomainAttributes
+	type VtDomainAttributes
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
-	private transformRef: EventRef;
+	settings!: MyPluginSettings;
+	private transformRef: EventRef | undefined;
+	validTld: string[] | null | undefined;
 
 	async onload() {
 		await this.loadSettings();
 		const searchSites = new Map<string, string>();
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
-		this.registerView(VIEW_TYPE, (leaf) => new PluginSidebar(leaf, undefined, this.settings.validTld));
+		this.registerView(SVELTE_VIEW_TYPE, (leaf) => new SvelteSidebar(leaf, this));
 		this.addRibbonIcon("cat", "Activate view", () => {
 			this.activateView();
 		});
@@ -43,8 +44,9 @@ export default class MyPlugin extends Plugin {
 		} catch(e) {
 			console.log(e);
 		}
-		const tlds = await getValidTld();
-		if (tlds) this.settings.validTld = tlds;
+		this.validTld = await getValidTld();
+		if (this.validTld) this.settings.validTld = this.validTld;
+		else if (this.settings.validTld) this.validTld = this.settings.validTld;
 		await this.saveSettings();
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
@@ -82,7 +84,7 @@ export default class MyPlugin extends Plugin {
 		this.addCommand({
 			id: 'sample-editor-command',
 			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
 				editor.replaceSelection('Sample Editor Command');
 			},
 		});
@@ -99,7 +101,8 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
-		this.app.workspace.on('file-open', async (file: TFile) => {
+		this.app.workspace.on('file-open', async (file: TFile | null) => {
+			if (!file) return;
 			const className = 'my-button-container';
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView)?.containerEl;
 			if (!view) return;
@@ -163,12 +166,12 @@ export default class MyPlugin extends Plugin {
 	async activateView() {
 		const {workspace} = this.app;
 		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(VIEW_TYPE);
+		const leaves = workspace.getLeavesOfType(SVELTE_VIEW_TYPE);
 		if (leaves.length > 0) {
 			leaf = leaves[0];
 		} else {
 			leaf = workspace.getRightLeaf(false);
-			await leaf?.setViewState({type: VIEW_TYPE});
+			await leaf?.setViewState({type: SVELTE_VIEW_TYPE});
 		}
 		if (!leaf) return;
 		workspace.revealLeaf(leaf);
@@ -176,7 +179,7 @@ export default class MyPlugin extends Plugin {
 
 	onunload() {
 		console.log('unloaded');
-		this.app.workspace.offref(this.transformRef);
+		if (this.transformRef) this.app.workspace.offref(this.transformRef);
 	}
 
 	async loadSettings() {

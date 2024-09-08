@@ -1,5 +1,5 @@
-import { RequestUrlParam, TFile, request } from "obsidian";
-import { Code } from "./modal";
+import { type RequestUrlParam, TFile, request } from "obsidian";
+import type { Code } from "./modal";
 export {
     addUniqueValuesToArray,
     constructMacroRegex,
@@ -21,7 +21,8 @@ export {
     replaceTemplateText,
     todayLocalDate,
     todayFolderStructure,
-    validateDomain
+    validateDomain,
+    validateDomains
 }
 
 // regex for possibly defanged values
@@ -88,7 +89,6 @@ function todayFolderStructure(prefs: folderPrefs): Array<string> {
     if (prefs.quarter) folderArray.push(`${year}-Q${currentQuarter}`);
     if (prefs.month) folderArray.push(yearMonth);
     if (prefs.day) folderArray.push(date);
-    const folders = folderArray.join('/');
     return folderArray;
 }
 
@@ -324,4 +324,17 @@ function removeArrayDuplicates(array: string[]): string[] {
 
 function convertTime(timeString: string): number {
     return Date.parse(timeString);
+}
+
+function validateDomains(domains: string[], validTld: string[]) {
+    let index = domains.length - 1;
+    while (index >= 0) {
+        const domain = domains[index];
+        if (!validateDomain(domain, validTld)) {
+            domains.splice(index, 1);
+            console.log(domains.length);
+        }
+        index -= 1;
+    }
+    return domains;
 }
