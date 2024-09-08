@@ -1,7 +1,7 @@
-import { ItemView, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { ItemView, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 import Sidebar from "src/components/Sidebar.svelte";
-import { vtSearch, type searchSite } from "./sidebar";
-import { DOMAIN_REGEX, extractMatches, HASH_REGEX, IP_REGEX, refangIoc, removeArrayDuplicates, validateDomain, validateDomains } from "./textUtils";
+import { type searchSite } from "./sidebar";
+import { DOMAIN_REGEX, extractMatches, HASH_REGEX, IP_REGEX, refangIoc, removeArrayDuplicates, validateDomains } from "./textUtils";
 import type MyPlugin from "main";
 
 export const SVELTE_VIEW_TYPE = "Svelte-Sidebar";
@@ -73,6 +73,7 @@ export class SvelteSidebar extends ItemView {
     }
 
     async getMatches(file: TFile) {
+        console.log(`checking matches on ${file.basename}`)
         const fileContent = await this.app.vault.cachedRead(file);
         this.iocs = [];
         const ips: ParsedIndicators = {

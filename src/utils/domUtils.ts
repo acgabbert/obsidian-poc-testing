@@ -9,7 +9,7 @@ function removeElements(els: HTMLCollectionOf<Element>) {
      * @param els a collection of HTML elements
      */
     if (els && els.length > 0) {
-        Array.from(els).forEach((el: HTMLObjectElement) => {
+        Array.from(els).forEach((el: Element, index: number, array: Element[]) => {
             try {
                 el.parentNode?.removeChild(el);
             } catch { }

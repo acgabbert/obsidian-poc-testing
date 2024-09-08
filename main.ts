@@ -1,4 +1,4 @@
-import { Editor, type EventRef, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
+import { Editor, type EventRef, type MarkdownFileInfo, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
 import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
@@ -12,7 +12,6 @@ import {
 	SVELTE_VIEW_TYPE,
 	SvelteSidebar,
 	todayFolderStructure,
-	VIEW_TYPE,
 	getValidTld,
 	virusTotal,
 	VT_DOMAIN,
@@ -25,8 +24,8 @@ import {
 } from 'src/utils';
 
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
-	private transformRef: EventRef;
+	settings!: MyPluginSettings;
+	private transformRef: EventRef | undefined;
 	validTld: string[] | null | undefined;
 
 	async onload() {
@@ -85,7 +84,7 @@ export default class MyPlugin extends Plugin {
 		this.addCommand({
 			id: 'sample-editor-command',
 			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
 				editor.replaceSelection('Sample Editor Command');
 			},
 		});
@@ -102,7 +101,8 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
-		this.app.workspace.on('file-open', async (file: TFile) => {
+		this.app.workspace.on('file-open', async (file: TFile | null) => {
+			if (!file) return;
 			const className = 'my-button-container';
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView)?.containerEl;
 			if (!view) return;
@@ -179,7 +179,7 @@ export default class MyPlugin extends Plugin {
 
 	onunload() {
 		console.log('unloaded');
-		this.app.workspace.offref(this.transformRef);
+		if (this.transformRef) this.app.workspace.offref(this.transformRef);
 	}
 
 	async loadSettings() {

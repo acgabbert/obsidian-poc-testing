@@ -89,7 +89,6 @@ function todayFolderStructure(prefs: folderPrefs): Array<string> {
     if (prefs.quarter) folderArray.push(`${year}-Q${currentQuarter}`);
     if (prefs.month) folderArray.push(yearMonth);
     if (prefs.day) folderArray.push(date);
-    const folders = folderArray.join('/');
     return folderArray;
 }
 

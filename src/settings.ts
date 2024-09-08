@@ -42,7 +42,6 @@ class MySettingTab extends PluginSettingTab {
 		containerEl.empty();
 		const vault = this.app.vault;
 		const folders = vault.getAllFolders();
-		const subFolders = (await vault.adapter.list('')).folders;
         let topLevelFiles = (await vault.adapter.list('')).files;
         topLevelFiles = removeDotObsidian(topLevelFiles);
 
