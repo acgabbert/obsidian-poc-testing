@@ -1,12 +1,30 @@
 <script lang="ts">
-    import { vtSearch, type ParsedIndicators } from "../utils";
+    import { type ParsedIndicators } from "../utils";
     
     import Item from "./Item.svelte";
 	import Button from "./Button.svelte";
 
     export let indicatorList: ParsedIndicators;
-
-    const searchSites = [vtSearch]
+    let multisearchLinks = new Map<string, string>();
+    $: indicatorList.sites?.forEach((site) => {
+        console.log(`checking multisearch for ${site.shortName}`)
+        if (site.multisearch && indicatorList.items.length > 1) {
+            indicatorList.items.forEach((item) => {
+                if (!multisearchLinks.has(site.shortName)) {
+                    multisearchLinks.set(site.shortName, site.site.replace('%s', item));
+                } else {
+                    const url = multisearchLinks.get(site.shortName);
+                    if (!url) {
+                        multisearchLinks.set(site.shortName, site.site.replace('%s', item));
+                    } else if (!url.includes(item)) {
+                        multisearchLinks.set(site.shortName, url + site.separator + item);
+                    }
+                    console.log(`added ${item} to ${site.shortName}`);
+                    console.log(multisearchLinks.get(site.shortName));
+                }
+            })
+        }
+    })
 </script>
 
 <details class="sidebar-container tree-item" open>
@@ -21,9 +39,9 @@
             <table>
                 <tr class="sidebar-table-row">
                         {#each indicatorList.sites as site}
-                            {#if site.multisearch}
+                            {#if site.multisearch && multisearchLinks.has(site.shortName)}
                                 <Button 
-                                    href={site.site.replace('%s', indicatorList.items[0])} 
+                                    href={multisearchLinks.get(site.shortName)}
                                     title={`Multisearch ${site.shortName}`}
                                 />
                             {/if}
