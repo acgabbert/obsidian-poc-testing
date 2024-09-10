@@ -1,5 +1,5 @@
 import { ItemView, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
-import Sidebar from "src/components/Sidebar.svelte";
+import Sidebar from "../components/Sidebar.svelte";
 import { type searchSite } from "./sidebar";
 import { DOMAIN_REGEX, extractMatches, HASH_REGEX, IP_REGEX, refangIoc, removeArrayDuplicates, validateDomains } from "./textUtils";
 import type MyPlugin from "main";
@@ -16,6 +16,10 @@ export class SvelteSidebar extends ItemView {
     sidebar: Sidebar | undefined;
     iocs: ParsedIndicators[] | undefined;
     plugin: MyPlugin | undefined;
+
+    ipExclusions: string[] | undefined;
+    domainExclusions: string[] | undefined;
+    hashExclusions: string[] | undefined;
     
     ipRegex = IP_REGEX;
     hashRegex = HASH_REGEX;
@@ -97,7 +101,26 @@ export class SvelteSidebar extends ItemView {
         this.iocs.push(domains);
         this.iocs.push(hashes);
         this.refangIocs();
-        //this.processExclusions();
+        this.processExclusions();
+    }
+
+    processExclusions() {
+        this.iocs?.forEach(indicatorList => {
+            switch(indicatorList.title) {
+                case "IPs":
+                    this.ipExclusions?.forEach(ip => {
+                        if (indicatorList.items.includes(ip)) indicatorList.items.splice(indicatorList.items.indexOf(ip), 1);
+                    });
+                case "Domains":
+                    this.domainExclusions?.forEach(domain => {
+                        if (indicatorList.items.includes(domain)) indicatorList.items.splice(indicatorList.items.indexOf(domain), 1);
+                    });
+                case "Hashes":
+                    this.hashExclusions?.forEach(hash => {
+                        if (indicatorList.items.includes(hash)) indicatorList.items.splice(indicatorList.items.indexOf(hash), 1);
+                    });
+            }
+        });
     }
 
     private refangIocs() {
