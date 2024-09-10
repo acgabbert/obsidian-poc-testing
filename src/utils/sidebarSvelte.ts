@@ -83,17 +83,17 @@ export class SvelteSidebar extends ItemView {
         const ips: ParsedIndicators = {
             title: "IPs",
             items: extractMatches(fileContent, this.ipRegex),
-            sites: this.plugin?.settings.searchSites.filter((x) => x.ip)
+            sites: this.plugin?.settings.searchSites.filter((x) => x.enabled && x.ip)
         }
         const domains: ParsedIndicators = {
             title: "Domains",
             items: extractMatches(fileContent, this.domainRegex),
-            sites: this.plugin?.settings.searchSites.filter((x) => x.domain)
+            sites: this.plugin?.settings.searchSites.filter((x) => x.enabled && x.domain)
         }
         const hashes: ParsedIndicators = {
             title: "Hashes",
             items: extractMatches(fileContent, this.hashRegex),
-            sites: this.plugin?.settings.searchSites.filter((x) => x.hash)
+            sites: this.plugin?.settings.searchSites.filter((x) => x.enabled && x.hash)
         }
         if (this.plugin?.validTld) 
             domains.items = validateDomains(domains.items, this.plugin.validTld);
