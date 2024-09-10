@@ -1,6 +1,6 @@
 <script lang="ts">
     import Button from "./Button.svelte";
-	import type { searchSite } from "src/utils";
+	import type { searchSite } from "../utils";
 
     export let item: string;
     export let buttons: searchSite[] | undefined;

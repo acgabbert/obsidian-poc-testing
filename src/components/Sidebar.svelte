@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ParsedIndicators } from "src/utils";
+	import type { ParsedIndicators } from "../utils";
     import IocList from "./IocList.svelte";
     //export let iocList: string[];
     export let indicators: ParsedIndicators[];

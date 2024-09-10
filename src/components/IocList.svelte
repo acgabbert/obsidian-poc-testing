@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { vtSearch, type ParsedIndicators } from "src/utils";
+    import { vtSearch, type ParsedIndicators } from "../utils";
     
     import Item from "./Item.svelte";
 	import Button from "./Button.svelte";

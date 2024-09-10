@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { SvelteSidebar } from "src/utils";
+import type { SvelteSidebar } from "../utils";
 
 const sidebar = writable<SvelteSidebar>();
 export default { sidebar };
