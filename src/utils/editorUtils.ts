@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, MarkdownView, TFile } from "obsidian";
+import { App, Editor, type EditorPosition, MarkdownView, TFile } from "obsidian";
 export { appendToEnd, transformSelectedText };
 
 function transformSelectedText(editor: Editor, func: Function) {

@@ -1,4 +1,4 @@
-import { apiRequest, ApiVals } from "./api";
+import { apiRequest, type ApiVals } from "./api";
 
 export { virusTotal };
 
