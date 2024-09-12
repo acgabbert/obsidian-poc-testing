@@ -14,11 +14,10 @@ import {
 	HASH_REGEX,
 	DOMAIN_REGEX,
 } from "@acgabbert/obsidian-utils";
+import { SVELTE_VIEW_TYPE, SvelteSidebar } from "obsidian-svelte-components";
 
 import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
-	SVELTE_VIEW_TYPE,
-	SvelteSidebar,
 	virusTotal,
 	VT_HASH,
 	VT_DOMAIN,
