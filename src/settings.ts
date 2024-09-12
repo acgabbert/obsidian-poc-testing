@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 import MyPlugin from "main";
-import { defaultSites, type folderPrefs, removeDotObsidian, type searchSite } from "@acgabbert/obsidian-utils";
+import { defaultSites, type folderPrefs, removeDotObsidian, type searchSite } from "obsidian-cyber-utils";
 
 export { DEFAULT_SETTINGS, MySettingTab };
 export type { MyPluginSettings };

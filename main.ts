@@ -13,8 +13,9 @@ import {
 	removeElements,
 	HASH_REGEX,
 	DOMAIN_REGEX,
-} from "@acgabbert/obsidian-utils";
+} from "obsidian-cyber-utils";
 import { SVELTE_VIEW_TYPE, SvelteSidebar } from "obsidian-svelte-components";
+import IocList from 'obsidian-svelte-components/dist/IocList.svelte';
 
 import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
