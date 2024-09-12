@@ -1,7 +1,6 @@
 import { Editor, type EventRef, type MarkdownFileInfo, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
-
-import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
+	appendToEnd,
 	CodeListModal,
 	addButtonContainer,
 	addButtonToContainer,
@@ -9,17 +8,20 @@ import {
 	createNote,
 	defangDomain,
 	parseCodeBlocks,
-	SVELTE_VIEW_TYPE,
-	SvelteSidebar,
 	todayFolderStructure,
 	getValidTld,
-	virusTotal,
-	VT_DOMAIN,
 	removeElements,
 	HASH_REGEX,
-	VT_HASH,
-	appendToEnd,
 	DOMAIN_REGEX,
+} from "@acgabbert/obsidian-utils";
+
+import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
+import {
+	SVELTE_VIEW_TYPE,
+	SvelteSidebar,
+	virusTotal,
+	VT_HASH,
+	VT_DOMAIN,
 	type VtDomainAttributes
 } from 'src/utils';
 

@@ -15,6 +15,9 @@ export const loadingMessage = 'Loading... ⏳';
 export const loadingMessage2 = 'Loading... ⌛';
 
 async function apiRequest(vals: ApiVals, val: string, key: string): Promise<VtResponse> {
+    /**
+     * Make an API request with Obsidian's built-in
+     */
     const headers = {'x-apikey': key};
     const vtParams = {url: vals.baseUrl + val, headers: headers, throw: true} as RequestUrlParam;
     const data = await request(vtParams);
