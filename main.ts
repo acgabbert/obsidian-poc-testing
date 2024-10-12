@@ -1,4 +1,4 @@
-import { Editor, type EventRef, type MarkdownFileInfo, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
+import { App, Editor, type EventRef, type MarkdownFileInfo, MarkdownView, Modal, Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 import {
 	appendToEnd,
 	CodeListModal,
@@ -13,9 +13,12 @@ import {
 	removeElements,
 	HASH_REGEX,
 	DOMAIN_REGEX,
+	getBacklinks,
 } from "obsidian-cyber-utils";
-import { SVELTE_VIEW_TYPE, SvelteSidebar } from "obsidian-svelte-components";
-import IocList from 'obsidian-svelte-components/dist/IocList.svelte';
+import { 
+	SVELTE_VIEW_TYPE, DropdownLinkModal, type DropdownOption,
+	SettingCollectionModal, type BooleanSetting
+} from "obsidian-svelte-components";
 
 import { DEFAULT_SETTINGS, type MyPluginSettings, MySettingTab } from 'src/settings';
 import {
@@ -24,17 +27,26 @@ import {
 	VT_DOMAIN,
 	type VtDomainAttributes
 } from 'src/utils';
+import { initializeWorker, ocr, ocrMultiple } from 'src/utils/ocr';
+import { SvelteSidebar } from 'src/utils/sidebar';
+import type { Worker } from 'tesseract.js';
 
 export default class MyPlugin extends Plugin {
 	settings!: MyPluginSettings;
 	private transformRef: EventRef | undefined;
 	validTld: string[] | null | undefined;
+	worker: Worker | undefined;
 
 	async onload() {
 		await this.loadSettings();
+		this.worker = await initializeWorker();
 		const searchSites = new Map<string, string>();
 		searchSites.set('DuckDuckGo', 'https://duckduckgo.com/?q=%s');
-		this.registerView(SVELTE_VIEW_TYPE, (leaf) => new SvelteSidebar(leaf, this));
+		this.registerView(SVELTE_VIEW_TYPE, (leaf) => {
+			const sidebar = new SvelteSidebar(leaf, this, this.worker);
+			sidebar.splitLocalIp = false;
+			return sidebar;
+		});
 		this.addRibbonIcon("cat", "Activate view", () => {
 			this.activateView();
 		});
@@ -105,6 +117,10 @@ export default class MyPlugin extends Plugin {
 
 		this.app.workspace.on('file-open', async (file: TFile | null) => {
 			if (!file) return;
+			const attachments = getAttachments(file.path, this.app);
+			if (!this.worker) return;
+			//const results = await ocrMultiple(this.app, attachments, this.worker);
+			//console.log(results);
 			const className = 'my-button-container';
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView)?.containerEl;
 			if (!view) return;
@@ -113,10 +129,38 @@ export default class MyPlugin extends Plugin {
 			const container = addButtonContainer(this.app.workspace, file, className);
 			if (!container) return;
 			const button = addButtonToContainer(container, 'Button!').onClick(() => {
-				new Notice('Button clicked!')
+				const options: DropdownOption[] = [
+					{label: "Google", url: "https://www.google.com"},
+					{label: "GitHub", url: "https://www.github.com"},
+					{label: "Hacker News", url: "https://news.ycombinator.com/"}
+				]
+				new DropdownLinkModal(this.app, options).open();
 			});
 			const button2 = addButtonToContainer(container, 'Button 2!').onClick(() => {
-				new Notice('Button clicked!')
+				console.log('trying');
+				let checkboxModal = new Modal(this.app);
+				const target = checkboxModal.contentEl;
+				if (!target) return;
+				console.log('target exists');
+				const settings: BooleanSetting[] = [
+					{
+						key: "booleanTest",
+						displayName: "Boolean Test!",
+						value: this.settings["booleanTest"]
+					}
+				];
+				new SettingCollectionModal(this, settings, "title", async (settings) => {
+					console.log(this.settings);
+					settings.forEach(async (setting, index) => {
+						if (setting.key !== undefined) {
+							const settingKey: keyof MyPluginSettings = setting.key;
+							if (this.settings[settingKey] === undefined) return;
+							this.settings[settingKey] = setting.value;
+							console.log(`set ${this.settings[settingKey]}`);
+						}
+						await this.saveSettings();
+					});
+				}).open();
 			});
 			const button3 = addButtonToContainer(container, 'Button 3!').onClick(() => {
 				new Notice('Button clicked!')
@@ -182,6 +226,7 @@ export default class MyPlugin extends Plugin {
 	onunload() {
 		console.log('unloaded');
 		if (this.transformRef) this.app.workspace.offref(this.transformRef);
+		if (this.worker) this.worker.terminate();
 	}
 
 	async loadSettings() {
@@ -189,6 +234,19 @@ export default class MyPlugin extends Plugin {
 	}
 
 	async saveSettings() {
+		console.log('saving settings');
 		await this.saveData(this.settings);
 	}
+}
+
+function getAttachments(notePath: string, app: App): Array<string> {
+    let attachments: string[] = [];
+    const links = getBacklinks(notePath, app, true);
+    links.forEach((link) => {
+        const file = app.vault.getAbstractFileByPath(link);
+        if (file && file instanceof TFile && file.extension !== "md") {
+            attachments.push(file.path);
+        }
+    });
+    return attachments;
 }

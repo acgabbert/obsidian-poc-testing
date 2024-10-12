@@ -15,6 +15,7 @@ interface MyPluginSettings {
 	validTld: string[];
 	searchSites: searchSite[];
 	folder: folderPrefs;
+	booleanTest: boolean;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -25,7 +26,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	ipdbApiKey: '',
 	validTld: [],
 	searchSites: defaultSites,
-	folder: {year: true, quarter: true, month: true, day: true}
+	folder: {year: true, quarter: true, month: true, day: true},
+	booleanTest: true
 }
 
 class MySettingTab extends PluginSettingTab {
@@ -103,5 +105,17 @@ class MySettingTab extends PluginSettingTab {
 					})
 				)
 		})
+		new Setting(containerEl)
+			.setName('Booleans')
+			.setHeading();
+		new Setting(containerEl)
+			.setName("Boolean 1")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.booleanTest)
+				.onChange(async (value) => {
+					this.plugin.settings.booleanTest = value;
+					await this.plugin.saveSettings();
+				})
+			)
 	}
 }

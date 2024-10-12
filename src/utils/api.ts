@@ -1,5 +1,5 @@
 import { App, Notice, type RequestUrlParam, TFile, request } from "obsidian";
-import { appendToEnd } from "./editorUtils";
+import { appendToEnd } from "obsidian-cyber-utils";
 import type { VtResponse } from "./vt";
 
 export { apiRequest, appendResult }

@@ -29,6 +29,7 @@
 		"tslib": "2.4.0",
 		"typescript": "^5",
 		"obsidian-cyber-utils": "latest",
-		"obsidian-svelte-components": "latest"
+		"obsidian-svelte-components": "latest",
+    	"tesseract.js": "^4.1.1"
 	}
 }
